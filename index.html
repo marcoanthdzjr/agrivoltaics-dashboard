@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agrivoltaics Validation Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body class="bg-gray-100 font-sans p-4 md:p-8">
+
+    <div class="max-w-[90rem] mx-auto">
+        <header class="mb-8">
+            <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Agrivoltaics Validation & Generation Dashboard</h1>
+            <p class="text-gray-600 mt-2">Comparative analysis of ARM Ground Truth vs. NSRDB Satellite data across 4 configurations.</p>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-md p-6 mb-10 border border-gray-200">
+            <h2 class="text-2xl font-bold text-blue-900 border-b pb-3 mb-6">Southern Great Plains (Lamont, OK - 2019)</h2>
+            
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+                <div class="xl:col-span-5">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Model Error Metrics</h3>
+                    <div id="sgpMetrics" class="overflow-x-auto rounded-lg border border-gray-200">
+                        <p class="p-4 text-sm text-gray-500 italic">Loading SGP Validation Metrics...</p>
+                    </div>
+                </div>
+                
+                <div class="xl:col-span-7">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Interactive Annual Generation Profile</h3>
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 relative" style="height: 400px;">
+                        <canvas id="sgpChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 text-right">💡 Tip: Click items in the legend to toggle lines on/off.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+            <h2 class="text-2xl font-bold text-orange-900 border-b pb-3 mb-6">Houston TRACER (Texas - Oct 2021/Sep 2022)</h2>
+            
+            <div class="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start">
+                <div class="xl:col-span-5">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Model Error Metrics</h3>
+                    <div id="houMetrics" class="overflow-x-auto rounded-lg border border-gray-200">
+                        <p class="p-4 text-sm text-gray-500 italic">Loading Houston Validation Metrics...</p>
+                    </div>
+                </div>
+                
+                <div class="xl:col-span-7">
+                    <h3 class="text-lg font-semibold text-gray-700 mb-3">Interactive Chronological Generation Profile</h3>
+                    <div class="bg-gray-50 border border-gray-200 rounded-lg p-4 relative" style="height: 400px;">
+                        <canvas id="houChart"></canvas>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-2 text-right">💡 Tip: Click items in the legend to toggle lines on/off.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // --- 1. TABLE LOADER LOGIC ---
+        function loadCSVTable(filename, containerId) {
+            Papa.parse(filename, {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if (results.data.length === 0) return;
+                    let tableHTML = '<table class="min-w-full text-sm text-left whitespace-nowrap"><thead class="bg-gray-100 border-b border-gray-200"><tr>';
+                    Object.keys(results.data[0]).forEach(key => {
+                        tableHTML += `<th class="px-4 py-3 font-semibold text-gray-700">${key}</th>`;
+                    });
+                    tableHTML += '</tr></thead><tbody class="divide-y divide-gray-200">';
+                    results.data.forEach(row => {
+                        tableHTML += '<tr class="hover:bg-gray-50 transition-colors">';
+                        Object.values(row).forEach(val => {
+                            tableHTML += `<td class="px-4 py-3 text-gray-600">${val}</td>`;
+                        });
+                        tableHTML += '</tr>';
+                    });
+                    tableHTML += '</tbody></table>';
+                    document.getElementById(containerId).innerHTML = tableHTML;
+                },
+                error: function(err) {
+                    console.error("Error loading table:", filename, err);
+                    document.getElementById(containerId).innerHTML = `<p class="p-4 text-red-500">Failed to load data. Ensure the CSV is uploaded to GitHub.</p>`;
+                }
+            });
+        }
+
+        // --- 2. INTERACTIVE CHART BUILDER LOGIC ---
+        const colorPalette = {
+            "Fixed_Tilt": "#E63946",       // Red
+            "Single-Axis": "#1D3557",      // Deep Blue
+            "Dual-Axis": "#2A9D8F",        // Teal/Green
+            "Vertical_Bifacial": "#9C89B8" // Purple
+        };
+
+        function loadCSVChart(filename, canvasId, prefix) {
+            Papa.parse(filename, {
+                download: true,
+                header: true,
+                dynamicTyping: true,
+                skipEmptyLines: true,
+                complete: function(results) {
+                    if(results.data.length === 0) return;
+
+                    let monthlyData = {};
+                    let orderedKeys = [];
+                    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+
+                    // Aggregate Hourly Data into Monthly MWh
+                    results.data.forEach(row => {
+                        if (!row.Month) return;
+                        
+                        let dateKey, displayLabel;
+                        if (row.Year && prefix === 'HOU') {
+                            dateKey = row.Year + '-' + String(row.Month).padStart(2, '0');
+                            displayLabel = monthNames[row.Month - 1] + ' ' + row.Year;
+                        } else {
+                            dateKey = row.Month;
+                            displayLabel = monthNames[row.Month - 1];
+                        }
+
+                        if (!monthlyData[dateKey]) {
+                            monthlyData[dateKey] = { label: displayLabel };
+                            orderedKeys.push(dateKey); 
+                        }
+
+                        // Convert kW to MWh
+                        Object.keys(row).forEach(col => {
+                            if (col.startsWith(prefix)) {
+                                if (!monthlyData[dateKey][col]) monthlyData[dateKey][col] = 0;
+                                monthlyData[dateKey][col] += (row[col] / 1000); 
+                            }
+                        });
+                    });
+
+                    // Build Chart.js Datasets
+                    let labels = orderedKeys.map(k => monthlyData[k].label);
+                    let datasets = [];
+                    let configurations = ["Fixed_Tilt", "Single-Axis", "Dual-Axis", "Vertical_Bifacial"];
+
+                    configurations.forEach(config => {
+                        // ARM Dataset (Solid)
+                        let armData = orderedKeys.map(k => monthlyData[k][`${prefix}_ARM_${config}`]);
+                        datasets.push({
+                            label: `ARM: ${config.replace('_', ' ')}`,
+                            data: armData,
+                            borderColor: colorPalette[config],
+                            backgroundColor: colorPalette[config],
+                            borderWidth: 2,
+                            tension: 0.1,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        });
+
+                        // NSRDB Dataset (Dashed)
+                        let nsrdbData = orderedKeys.map(k => monthlyData[k][`${prefix}_NSRDB_${config}`]);
+                        datasets.push({
+                            label: `NSRDB: ${config.replace('_', ' ')}`,
+                            data: nsrdbData,
+                            borderColor: colorPalette[config],
+                            backgroundColor: '#ffffff',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            tension: 0.1,
+                            pointRadius: 4,
+                            pointHoverRadius: 6
+                        });
+                    });
+
+                    // Render Chart
+                    const ctx = document.getElementById(canvasId).getContext('2d');
+                    new Chart(ctx, {
+                        type: 'line',
+                        data: { labels: labels, datasets: datasets },
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            interaction: { mode: 'index', intersect: false },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            return context.dataset.label + ': ' + context.parsed.y.toFixed(2) + ' MWh';
+                                        }
+                                    }
+                                },
+                                legend: {
+                                    position: 'right',
+                                    labels: { usePointStyle: true, boxWidth: 8, font: { size: 11 } }
+                                }
+                            },
+                            scales: {
+                                y: { title: { display: true, text: 'Total Generation (MWh)' }, beginAtZero: true },
+                                x: { grid: { display: false } }
+                            }
+                        }
+                    });
+                }
+            });
+        }
+
+        // --- 3. EXECUTE DASHBOARD BUILD (Using Explicit Relative Paths) ---
+        loadCSVTable('./SGP_Validation_Metrics.csv', 'sgpMetrics');
+        loadCSVTable('./Houston_Validation_Metrics.csv', 'houMetrics');
+        
+        loadCSVChart('./SGP_Hourly_Profile.csv', 'sgpChart', 'SGP');
+        loadCSVChart('./HOU_Hourly_Profile.csv', 'houChart', 'HOU');
+    </script>
+</body>
+</html>

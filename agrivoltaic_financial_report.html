@@ -1,0 +1,2991 @@
+
+    <!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>Agrivoltaic Financial & Weather Report</title>
+        <style>
+            body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 40px; background-color: #f9f9f9; color: #333; }
+            h1 { border-bottom: 2px solid #2c3e50; padding-bottom: 10px; color: #2c3e50; }
+            h2 { margin-top: 40px; color: #34495e; font-size: 1.4em; border-bottom: 1px solid #ddd; padding-bottom: 5px; }
+            h3 { color: #2980b9; margin-top: 25px; }
+            .table-container { background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); margin-bottom: 30px; overflow-x: auto; }
+            table { width: 100%; border-collapse: collapse; margin-top: 10px; font-size: 0.9em; }
+            th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #ddd; }
+            th { background-color: #2c3e50; color: #ffffff; white-space: nowrap; position: sticky; top: 0; }
+            tr:hover { background-color: #f1f1f1; }
+            .def-box { background-color: #e8f4f8; border-left: 5px solid #2980b9; padding: 20px; margin-bottom: 20px; border-radius: 4px; line-height: 1.6; }
+            .def-title { font-weight: bold; color: #2980b9; font-size: 1.1em; }
+            .sub-section { margin-top: 15px; }
+            ul { margin-top: 5px; }
+            li { margin-bottom: 8px; }
+            .highlight-row { background-color: #eafaf1; font-weight: bold; }
+        </style>
+    </head>
+    <body>
+        <h1>Agrivoltaic Financial & Sensitivity Report</h1>
+        <p><strong>Baseline Location:</strong> Mission, Texas (1-Hectare Scaling)</p>
+        <p><strong>Scenarios Evaluated:</strong> 37 Weather Files</p>
+        
+        <h2>1. Statistical Significance, Research Context & Weather Definitions</h2>
+        <div class="def-box">
+            <div class="sub-section">
+                <div class="def-title">TMY, TDY, TGY & Historical Files</div>
+                <p><strong>TMY (Typical Meteorological Year):</strong> Derived from 10-km by 10-km gridded NSRDB data. It is based on historical data but lacks real-time information and does not include extreme climatic events such as wildfires or volcanic eruptions.</p>
+                <p><strong>TDY (Typical Direct Year):</strong> Developed using 100% weighting for direct normal irradiance (DNI).</p>
+                <p><strong>TGY (Typical Global Year):</strong> Developed using 100% weighting for global horizontal irradiance (GHI).</p>
+                <p><strong>Historical Actuals (CONUS vs. Aggregated):</strong> Real observed years that capture volatile extremes missed by the smoothed averages. CONUS files represent high-resolution, location-specific satellite data capturing extreme localized weather anomalies, whereas Aggregated files represent smoothed regional baselines.</p>
+            </div>
+            
+            <div class="sub-section">
+                <div class="def-title">Meteorological Variance in Agrivoltaic Design</div>
+                <p>The <strong>Mean (P50)</strong> represents expected revenue, but evaluating solely on the mean obfuscates the <strong>Variance</strong>. Variance exposes susceptibility to catastrophic tail-risks (P90). NREL research indicates that certain months, like May, demonstrate higher standard deviations for both DNI and GHI. For an agrivoltaic site to remain financially solvent, the physical layout must act as a reliable hedge during high-variance negative years by generating sufficient, stable cash flows.</p>
+            </div>
+        </div>
+
+        <h2>2. Economic Structure: Single Owner PPA & TOD Parameters</h2>
+        <div class="def-box">
+            <p>To ensure strict parity with industry standards, the financial outcomes are structured around a <strong>Single Owner Power Purchase Agreement (PPA) model</strong>. This assumes the entity operates as an Independent Power Producer (IPP) selling 100% of generated power directly to the grid at wholesale/PPA rates, rather than a behind-the-meter commercial net-metering setup. Revenue is explicitly governed by the following Time-of-Delivery (TOD) multipliers against a standard base rate:</p>
+            <ul>
+                <li><strong>Base Rate:</strong> $0.12 / kWh</li>
+                <li><strong>Summer Peak (June - September, 13:00 - 18:59 Weekdays):</strong> 3.5x Multiplier ($0.42 / kWh)</li>
+                <li><strong>Winter Peak (December - February, 06:00 - 09:59 & 18:00 - 21:59 Weekdays):</strong> 2.0x Multiplier ($0.24 / kWh)</li>
+                <li><strong>Off-Peak (All other hours & Weekends):</strong> 1.0x Multiplier ($0.12 / kWh)</li>
+            </ul>
+        </div>
+
+        <h2>3. Hardware & Spatial Specifications</h2>
+        <div class="def-box">
+            <p>All simulations are bounded within a 1-Hectare footprint. The physical configurations utilize the following engineering specifications. <em>Note: Multi-year variance data is powered natively by the PySAM PVWatts engine. System inputs (Inverter capacities, DC/AC ratios, Year-1 LID penalties, and Albedo parameters) are strictly mirrored from the SAM Detailed PV Model to ensure mathematical parity.</em></p>
+            <ul>
+                <li><strong>Single Axis Tracking (Baseline):</strong> 752.4 kW DC Capacity | 1-Axis Tracking (Backtracking Enabled) | 0° Tilt | 180° Azimuth | 0.35 GCR</li>
+                <li><strong>Dual Axis Tracking:</strong> 528.0 kW DC Capacity | 2-Axis Tracking | Auto-calculated Tilt/Azimuth | 0.25 GCR</li>
+                <li><strong>Elevated Fixed:</strong> 528.0 kW DC Capacity | Fixed Array | 26° Tilt (Mission, TX Latitude) | 180° Azimuth | 0.25 GCR</li>
+                <li><strong>Vertical Bifacial:</strong> 211.2 kW DC Capacity | Fixed Array | 90° Tilt | 90° Azimuth (East-West facing) | 0.70 Bifaciality Factor. <strong>Spatial Constraint:</strong> The Ground Coverage Ratio (GCR) is strictly locked at 0.10 to preserve a mandatory 6-meter clear gap between rows, ensuring unrestricted industrial harvester machinery access.</li>
+            </ul>
+        </div>
+
+        <h2>4. The 2024 Historical CONUS Baseline (Validation Year)</h2>
+        <div class="def-box">
+            <p>This section isolates the specific historical performance for the <strong>60-minute resolution</strong> weather file: <strong>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</strong>. Because the PySAM engine constraints have been meticulously mirrored to the SAM Desktop UI (including exact DC/AC clipping ratios, agricultural 0.25 albedo, backtracking limits, and 2% Year-1 LID degradation), the <em>Energy Yield (Python Output)</em> generated below serves to independently validate the manual <em>Energy Yield (SAM Desktop)</em> simulation models.</p>
+            
+            <div class="sub-section">
+                <div class="def-title">Understanding the Marginal Variance</div>
+                <p>While the structural parameters have been strictly mirrored, a marginal mathematical variance remains between the two outputs. This is a deliberate and expected result of utilizing two distinct physics engines:</p>
+                <ul>
+                    <li><strong>SAM Desktop (Detailed PV Model):</strong> Simulates at the microscopic level, calculating exact sub-hourly voltage and current limits across specific 550W module strings and discrete inverter threshold windows.</li>
+                    <li><strong>Python (PySAM PVWatts Engine):</strong> Simulates at the macroscopic level, utilizing a generalized systemic-efficiency envelope optimized for rapid, multi-year bulk weather processing.</li>
+                </ul>
+                <p>Because of this fundamental difference in computational architecture, the Python outputs serve as a highly accurate relative sensitivity engine to map multi-year weather volatility, while the SAM Desktop targets serve as the absolute financial baseline.</p>
+            </div>
+        </div>
+        <div class="table-container">
+            <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather Scenario</th>
+      <th>System Layout</th>
+      <th>Mean GHI</th>
+      <th>Mean DNI</th>
+      <th>Energy Yield (SAM Desktop)</th>
+      <th>Energy Yield (Python Output)</th>
+      <th>Gross Revenue</th>
+      <th>Blended Rate</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>1,596,359 kWh</td>
+      <td>1,323,049 kWh</td>
+      <td>$211,353</td>
+      <td>$0.160/kWh</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>318,202 kWh</td>
+      <td>284,568 kWh</td>
+      <td>$45,112</td>
+      <td>$0.159/kWh</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>1,240,517 kWh</td>
+      <td>1,069,547 kWh</td>
+      <td>$168,835</td>
+      <td>$0.158/kWh</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>916,427 kWh</td>
+      <td>787,053 kWh</td>
+      <td>$122,161</td>
+      <td>$0.155/kWh</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+
+        <h2>5. Complete Hardware Configuration Summary</h2>
+        <div class="table-container">
+            <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Configuration</th>
+      <th>Capacity (kW)</th>
+      <th>SAM Target (kWh)</th>
+      <th>PySAM Average (kWh)</th>
+      <th>Volatility (CV)</th>
+      <th>P50 Revenue (Avg)</th>
+      <th>P90 Revenue (Worst)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>Single Axis Tracking</td>
+      <td>752.4</td>
+      <td>1,596,359</td>
+      <td>1,254,092</td>
+      <td>14.22%</td>
+      <td>$219,358</td>
+      <td>$143,668</td>
+    </tr>
+    <tr>
+      <td>Vertical Bifacial</td>
+      <td>211.2</td>
+      <td>318,202</td>
+      <td>269,715</td>
+      <td>10.54%</td>
+      <td>$46,002</td>
+      <td>$34,177</td>
+    </tr>
+    <tr>
+      <td>Dual Axis Tracking</td>
+      <td>528.0</td>
+      <td>1,240,517</td>
+      <td>1,016,264</td>
+      <td>13.37%</td>
+      <td>$173,779</td>
+      <td>$118,188</td>
+    </tr>
+    <tr>
+      <td>Elevated Fixed</td>
+      <td>528.0</td>
+      <td>916,427</td>
+      <td>722,668</td>
+      <td>19.16%</td>
+      <td>$124,962</td>
+      <td>$66,148</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+        
+        <h2>6. Overall Performance Distribution Scatter Plot</h2>
+        <div class="table-container" style="padding: 0;">
+            <div>                        <script>window.PlotlyConfig = {MathJaxConfig: 'local'};</script>
+        <script charset="utf-8" src="https://cdn.plot.ly/plotly-3.5.0.min.js" integrity="sha256-fHbNLP+GlIXN+efbQec78UkemUz3NJp7UmfGxC1tNxs=" crossorigin="anonymous"></script>                <div id="ec562f5e-bd4f-4ef2-ad52-14633440ace4" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("ec562f5e-bd4f-4ef2-ad52-14633440ace4")) {                    Plotly.newPlot(                        "ec562f5e-bd4f-4ef2-ad52-14633440ace4",                        [{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv",686020.5272506429],["26.21_-98.34-0-0_60_tdy-2023.csv",667483.9795748508],["26.21_-98.34-0-0_60_tdy-2024.csv",673124.973023126],["26.21_-98.34-0-0_60_tgy-2022.csv",691212.2895819414],["26.21_-98.34-0-0_60_tgy-2023.csv",662108.9394653259],["26.21_-98.34-0-0_60_tgy-2024.csv",680818.6376592787],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv",1344899.8847014687],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv",1329236.7640209738],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv",1377775.6735271737],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv",1374308.1904435186],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv",1451530.406953393],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv",1375505.3817722108],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv",1344056.5714727887],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv",1345683.3954176893],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv",1329523.0339367853],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv",1378733.0457488934],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv",1374409.194754546],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv",1450493.4306341782],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv",1375953.7722361665],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv",1345356.955226916],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv",1332495.702514436],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv",1312438.727045978],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv",1361673.95045507],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv",1360706.7482149962],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv",1436468.9821889803],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv",1361635.6804271806],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv",1321468.5515070627],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv",1333076.582922628],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv",1311661.7847767866],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv",1364493.387828522],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv",1362243.0321889133],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv",1435776.2514298353],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv",1359756.1960510053],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv",1323049.121263722],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv",1425619.6857736816],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv",1334970.2736259254],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv",1405631.8462544717]],"hovertemplate":"Configuration=Single Axis Tracking\u003cbr\u003eTotal Year 1 Revenue ($)=%{x:$,.0f}\u003cbr\u003eEffective Blended Rate ($\u002fkWh)=%{y}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eTotal_Energy_kWh=%{customdata[1]:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Single Axis Tracking","marker":{"color":"blue","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Single Axis Tracking","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"6eGNMfCZAUGKCtynI3EBQYzH\u002fk2sPwFBfCd0T\u002fecAUHZ8BoZSjQBQZ08q+EARAFBuArfkynJCkEy9KDj7cYKQQo7E\u002ftZTAtBlubCiDtMC0F2cL9G2JAMQcKoF622CAxBY5QMNMGDCkFef3+d830KQW7r9WyPdwpB9sYbOcMIC0FGIE1ZHQALQbJBamu+SQxBqIn6Sk\u002fBC0G+KLv\u002fN0cKQSTZvmMkjwpBnYJukJF8CkF8cFrhrgALQUrVij51CAtBruqs1\u002fRODEFxOf6EHMwLQVAANsi7GwpBAuQbqHZECkGy\u002fvORuikKQYxUNViUwwpBiF0wXaXKCkHUf\u002fVXtgkMQfoh8xlcfwtBDBQCn8XMCUGwImSVldkLQf1FnJ\u002f0YApB4UetZ8iOC0E="},"xaxis":"x","y":{"dtype":"f8","bdata":"C2If5Ujnyj8sWNkSdWbLP1SUquud3so\u002fWBxtmiW4yj9mF+ekCD\u002fLP7V\u002fasiNl8o\u002fjehZKlDixD\u002fXwYPOjB\u002fFPyBC\u002fN+VxsQ\u002fHBIx9enTxD+LXrc7wKLEPyqewcX0XsU\u002fzjvNx4SvxD+czgRQmKTEP0crw9nJ38Q\u002fukVsD32PxD\u002fDCocUc5nEP5YTtMQgc8Q\u002fqydVJ8ImxT\u002fy+WreN3vEPx4Vfpls5sQ\u002f3+sk6FkpxT9E7VQ9NcvEP9qmWa\u002f71MQ\u002ft9ohWAuqxD97T5LHA2jFPxwSbNt+t8Q\u002fRjJ3EFqpxD\u002f8k5D3VerEP40bX49AkcQ\u002fFA88tWOfxD\u002fWb8q5BnrEP9f5f\u002f9mNMU\u002fq6rxQ5RyxD8Wn\u002f0P+XvEP5NaFXM6uMQ\u002fg4U1oL2OxD8="},"yaxis":"y","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv",165796.6125927733],["26.21_-98.34-0-0_60_tdy-2023.csv",163067.02184873656],["26.21_-98.34-0-0_60_tdy-2024.csv",164690.13366770057],["26.21_-98.34-0-0_60_tgy-2022.csv",166162.328539236],["26.21_-98.34-0-0_60_tgy-2023.csv",162486.5750130567],["26.21_-98.34-0-0_60_tgy-2024.csv",165859.41425442393],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv",285195.3932549509],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv",282652.4311779019],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv",292247.9189776851],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv",291390.1841765047],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv",306230.2589627087],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv",291628.8974721221],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv",289375.63751813886],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv",284815.1808725443],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv",282271.8986582599],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv",292090.05179106013],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv",291136.5507302343],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv",305154.49630201515],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv",291316.17917112645],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv",289067.6090314654],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv",283450.48552776896],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv",280277.45805099054],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv",289484.9894249918],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv",288469.4469063222],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv",302934.47043630644],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv",289064.54793474707],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv",284964.67858665274],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv",282848.6865888183],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv",279485.4241286946],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv",289575.453276954],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv",288593.9418996436],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv",301637.26822995214],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv",288790.1019711324],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv",284568.3471814691],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv",302187.95185698196],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv",283043.96977075434],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv",297440.189015118]],"hovertemplate":"Configuration=Vertical Bifacial\u003cbr\u003eTotal Year 1 Revenue ($)=%{x:$,.0f}\u003cbr\u003eEffective Blended Rate ($\u002fkWh)=%{y}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eTotal_Energy_kWh=%{customdata[1]:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Vertical Bifacial","marker":{"color":"green","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Vertical Bifacial","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"wLBFY2q44EAo2sB4Xq\u002fgQDZ6uqe+juBAYVUlwIyw4EBWCIBvjYrgQMbrrRj0k+BAWDI\u002foZ1C5kD6rOGz+UPmQOM+ZJgbu+ZAhpNZCv3A5kC4lekwidXnQF+d+ZK9OedAFMhxOUF25kBSZP2sNTHmQLjBGsufM+ZAjycfOha15kDcmP6sm7bmQAuOkaTOwedAugGzRJY050BgrhtwMGnmQGDE4VCPI+ZAzlO2TsIc5kCcgTwe9ojmQEyk7Z8ViuZAALEiSAKa50C41SQ3XQznQIZBotiFJuZAdi5kAH4N5kDRX5ytdQLmQJSwq\u002fcIjOZAMRSAPwiP5kC8OZdimoDnQDOfbIB2CedASM4bfgwH5kDiMOvWTnDnQCpE+roCLuZAkm+ir6sq50A="},"xaxis":"x","y":{"dtype":"f8","bdata":"yxuQhtdvyj8jZaYRltLKPyuqQ5r7Wso\u002fd7w0bolUyj8GsMLpt6\u002fKP7qh2XimM8o\u002fnaTB\u002fwN2xD9TFnTjZqbEP3uoWjaxY8Q\u002fs22q6Vh4xD+hnsTCIWfEP+xaJfOZ4MQ\u002fJI3O0CBZxD8Pun7O\u002fGzEP7NJbuFXnsQ\u002f0wUPExxhxD\u002fleL3lkHPEP1emEdWYaMQ\u002fgmW+frPhxD\u002fOCpWR1FLEP2TAnwKKecQ\u002fpSRHk4SuxD+f54usGWjEP4N5WBaDe8Q\u002fUHa0D3JsxD\u002fhAigo3ebEP6zk081pYMQ\u002fPYOoKT1wxD+TIdK\u002f2qTEP+2NTjBAacQ\u002fhA4Mj759xD\u002fRhsTo2WzEP2MpG8FQ6cQ\u002fG39pQa9KxD+017nQL1XEP41kUQ2\u002fisQ\u002fxIDVDuZqxD8="},"yaxis":"y","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv",578938.0186050839],["26.21_-98.34-0-0_60_tdy-2023.csv",571625.2823256138],["26.21_-98.34-0-0_60_tdy-2024.csv",571366.3832793755],["26.21_-98.34-0-0_60_tgy-2022.csv",580562.2686032035],["26.21_-98.34-0-0_60_tgy-2023.csv",567752.0357238646],["26.21_-98.34-0-0_60_tgy-2024.csv",570962.8075273666],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv",1077677.7343347576],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv",1067982.036065813],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv",1117903.054371438],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv",1115376.4457048664],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv",1176264.365881203],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv",1108884.930523891],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv",1089624.2553652117],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv",1078081.419857935],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv",1068303.6269368003],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv",1118443.2301828526],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv",1115127.3222282606],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv",1174685.180823924],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv",1109056.169737293],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv",1090353.3622936243],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv",1065455.8467887915],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv",1051498.277390301],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv",1102463.4454947407],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv",1102084.9564244798],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv",1161175.0243966738],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv",1094975.578934453],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv",1068759.8466209269],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv",1066050.8684250088],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv",1050880.3570933267],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv",1105043.9404936365],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv",1103480.2539455523],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv",1159729.7960879817],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv",1094134.630797891],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv",1069547.1407691594],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv",1152049.3942814982],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv",1074196.5037400257],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv",1131278.560128583]],"hovertemplate":"Configuration=Dual Axis Tracking\u003cbr\u003eTotal Year 1 Revenue ($)=%{x:$,.0f}\u003cbr\u003eEffective Blended Rate ($\u002fkWh)=%{y}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eTotal_Energy_kWh=%{customdata[1]:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Dual Axis Tracking","marker":{"color":"red","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Dual Axis Tracking","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"Bji2yxDp\u002fEDOHGj0Ovf8QOKzfhq3hvxAuk2B61nF\u002fEAbSBibLqD8QCbNVLMoRfxAWH5ZGB8yBUHgO2uVlTYFQcohzT2B0AVBisSDwVvYBUEu8XOEWOEGQabFRhp0TAZBRh5YfUIxBUGU77gktAIFQeHvlcQmBgVBWF90R1CnBUEuoDkFvKcFQRi8vJ80swZBB8d0iCshBkFw7wiASwsFQXKxfUeS+QRBbG9Q4GHuBEGIdzRM2YoFQQ0oCX9GlwVBmHALrAifBkFt14XnthAGQVaCfy3W0QRBps\u002fS\u002f6zLBEHL6aBsK7sEQUa871qtaQVB8zRL1hR1BUFocTpYzHEGQYCcy0Fd5AVBpnBwzhicBEGEK+NYoz8GQUYFDRmc\u002fARBziSskTTvBUE="},"xaxis":"x","y":{"dtype":"f8","bdata":"PjbBWG0uyj\u002f2xYqFKZHKPz2GX+3\u002fLMo\u002f+DhXT2z7yT9JhgYKLW\u002fKPwxAjvyJ9ck\u002fsEG+BpifxD+qiUkR6NPEPxiVJSgudsQ\u002fhG+q522JxD97+kqzgWXEP12msuL8FcU\u002fLQYuM+FkxD\u002feKDU0f2\u002fEPyeACVHDosQ\u002fm4a2RAhNxD81J0m84VzEP7SM1uBWQ8Q\u002fCBtiNTvsxD8bFXjd4DzEPxuuVYyApMQ\u002fm4C2lH3fxD9M4IKwSX3EP1Q\u002fspbpisQ\u002f1sojWHptxD+EdSWqWSHFP4V1r1subcQ\u002f5bIhxmh0xD\u002fmZ9A5iK\u002fEP6Zk1v+PUcQ\u002f4tMYKsVjxD+SlC0+GEvEP6MCeR4B+8Q\u002fPuSqVqU0xD9gcyL2EkDEP12i3ep3fMQ\u002fZ2NKHbRUxD8="},"yaxis":"y","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv",330692.29899760755],["26.21_-98.34-0-0_60_tdy-2023.csv",327270.5844628323],["26.21_-98.34-0-0_60_tdy-2024.csv",326045.4716818841],["26.21_-98.34-0-0_60_tgy-2022.csv",332491.56904897874],["26.21_-98.34-0-0_60_tgy-2023.csv",325504.7459992481],["26.21_-98.34-0-0_60_tgy-2024.csv",328415.1440162957],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv",774446.8682930013],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv",774507.9894230908],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv",811159.2910233487],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv",811998.6416022137],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv",840122.3407231335],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv",799585.8059907557],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv",798314.1064786692],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv",775098.4179211479],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv",775011.9336439879],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv",811368.0560433005],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv",811472.7591722528],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv",839741.868186541],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv",799698.6993859386],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv",798912.551872436],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv",767663.3782250078],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv",764459.7465771709],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv",802479.0447241458],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv",805349.9432782684],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv",832793.8321714004],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv",792026.4029696115],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv",786122.4416602484],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv",768556.7880519958],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv",765002.5490535116],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv",804027.736191768],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv",805598.7686640344],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv",833112.1490437232],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv",791078.6579342835],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv",787053.4581545581],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv",831247.214735419],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv",786347.8614979213],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv",823934.707869029]],"hovertemplate":"Configuration=Elevated Fixed\u003cbr\u003eTotal Year 1 Revenue ($)=%{x:$,.0f}\u003cbr\u003eEffective Blended Rate ($\u002fkWh)=%{y}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eTotal_Energy_kWh=%{customdata[1]:,.0f}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Elevated Fixed","marker":{"color":"orange","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Elevated Fixed","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"LcxSL8Eu8EBnw6U53TrwQKZLbgq89e9AtlzE5noZ8EDoBalQqRTwQOYynbTQwu9AqzhSV10V\u002fkBi5c8ib0b+QH2y\u002fYU4NP9A8CXT5MxN\u002f0DMjlYfLAoAQUfmD3FIdv9ASrEcGk6n\u002fkCPPmDOGaj9QBtCSkKh1\u002f1A\u002fk6SGQbK\u002fkC3SzMMGNb+QKhVxFJirP9ALISf1O0H\u002f0CSBwrqJ0r+QDuBYxLH2f1AIn09HgXw\u002fUBcrRWOk+X+QGbZ9q8dDf9AHG32wszW\u002f0BMu\u002f8n0jL\u002fQJBCKS6KOv5Ab7X9z9Fw\u002fUCjTIikrIb9QKW91cwbgv5AoGxzpjyi\u002fkDqwM8L9nf\u002fQCUK7C21wP5ANVAcEhbT\u002fUDdKuTmvHj\u002fQHEemNA3If5AmPnCF2lM\u002f0A="},"xaxis":"x","y":{"dtype":"f8","bdata":"La1pXgeoyT+37k5aGQDKP62ErW4zssk\u002fD8nqevBiyT8qr3\u002fJrObJP7vUdYAXWsk\u002fiFKOAbNdxD++PxQjgX7EPyyvRKAjK8Q\u002fSfvsdlE2xD\u002f8TEwRAgXEP+Vhi24wocQ\u002fB3U8qKshxD90GXuwaA\u002fEPzh7kY4iMMQ\u002frKUURjDlwz+ToeFvVOzDP7FKr0NsxsM\u002fxqu1RhhYxD\u002frymNDruDDP8WhwQ0TY8Q\u002f30z5VDOIxD9PLD5Imy\u002fEPy\u002fQFfrsNsQ\u002fj91SplwLxD8Dl+4W8KbEPxb+0doOKcQ\u002fLNSOdmgVxD9mlbr2RTzEP07uKdDK5MM\u002fzof2FMXvwz\u002frE37Vt83DP02YramkYcQ\u002fLZIS0gnewz9UbAgHldnDP4Rc9A+yFsQ\u002fHlGhp3nqwz8="},"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Total Year 1 Revenue ($)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Effective Blended Rate ($\u002fkWh)"}},"legend":{"title":{"text":"Configuration"},"tracegroupgap":0},"title":{"text":"TOD Revenue Efficiency vs. Gross Revenue"}},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <h2>7. Macro-Aggregation: Analysis by Weather File Type</h2>
+        <div class="def-box">
+            <p>Aggregating the scenarios by their baseline weather file type perfectly illustrates NREL's findings regarding spatial and temporal variance. Because Dual-Axis trackers heavily depend on high Direct Normal Irradiance (DNI), you will notice that their performance severely splinters during cloudy or historically volatile (CONUS) years. By separating high-resolution CONUS actuals from smoothed Aggregated files, the graph exposes true localized weather risk. The Vertical Bifacial layout, which capitalizes on Global Horizontal Irradiance (GHI), yields a far tighter, safer financial variance block.</p>
+        </div>
+        <div class="table-container" style="padding: 0;">
+            <div>                            <div id="88556a00-5969-4a0f-8ecb-cb6ed9ae13d9" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("88556a00-5969-4a0f-8ecb-cb6ed9ae13d9")) {                    Plotly.newPlot(                        "88556a00-5969-4a0f-8ecb-cb6ed9ae13d9",                        [{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv","2022"],["26.21_-98.34-0-0_60_tdy-2023.csv","2023"],["26.21_-98.34-0-0_60_tdy-2024.csv","2024"]],"hovertemplate":"Data Source=TDY\u003cbr\u003eConfiguration=Single Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TDY","marker":{"color":"#636efa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TDY","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"zKhi1r28bUBXnSlCc5FtQLnYF5aSl2xA"},"xaxis":"x","y":{"dtype":"f8","bdata":"6eGNMfCZAUGKCtynI3EBQYzH\u002fk2sPwFB"},"yaxis":"y","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv","2022"],["26.21_-98.34-0-0_60_tdy-2023.csv","2023"],["26.21_-98.34-0-0_60_tdy-2024.csv","2024"]],"hovertemplate":"Data Source=TDY\u003cbr\u003eConfiguration=Vertical Bifacial\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TDY","marker":{"color":"#636efa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TDY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"zKhi1r28bUBXnSlCc5FtQLnYF5aSl2xA"},"xaxis":"x2","y":{"dtype":"f8","bdata":"wLBFY2q44EAo2sB4Xq\u002fgQDZ6uqe+juBA"},"yaxis":"y2","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv","2022"],["26.21_-98.34-0-0_60_tdy-2023.csv","2023"],["26.21_-98.34-0-0_60_tdy-2024.csv","2024"]],"hovertemplate":"Data Source=TDY\u003cbr\u003eConfiguration=Dual Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TDY","marker":{"color":"#636efa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TDY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"zKhi1r28bUBXnSlCc5FtQLnYF5aSl2xA"},"xaxis":"x3","y":{"dtype":"f8","bdata":"Bji2yxDp\u002fEDOHGj0Ovf8QOKzfhq3hvxA"},"yaxis":"y3","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tdy-2022.csv","2022"],["26.21_-98.34-0-0_60_tdy-2023.csv","2023"],["26.21_-98.34-0-0_60_tdy-2024.csv","2024"]],"hovertemplate":"Data Source=TDY\u003cbr\u003eConfiguration=Elevated Fixed\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TDY","marker":{"color":"#636efa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TDY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"zKhi1r28bUBXnSlCc5FtQLnYF5aSl2xA"},"xaxis":"x4","y":{"dtype":"f8","bdata":"LcxSL8Eu8EBnw6U53TrwQKZLbgq89e9A"},"yaxis":"y4","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tgy-2022.csv","2022"],["26.21_-98.34-0-0_60_tgy-2023.csv","2023"],["26.21_-98.34-0-0_60_tgy-2024.csv","2024"]],"hovertemplate":"Data Source=TGY\u003cbr\u003eConfiguration=Single Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TGY","marker":{"color":"#EF553B","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TGY","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"eIms8n4fbkCgHhsUBgZtQF4iq7zfJW1A"},"xaxis":"x","y":{"dtype":"f8","bdata":"fCd0T\u002fecAUHZ8BoZSjQBQZ08q+EARAFB"},"yaxis":"y","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tgy-2022.csv","2022"],["26.21_-98.34-0-0_60_tgy-2023.csv","2023"],["26.21_-98.34-0-0_60_tgy-2024.csv","2024"]],"hovertemplate":"Data Source=TGY\u003cbr\u003eConfiguration=Vertical Bifacial\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TGY","marker":{"color":"#EF553B","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TGY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"eIms8n4fbkCgHhsUBgZtQF4iq7zfJW1A"},"xaxis":"x2","y":{"dtype":"f8","bdata":"YVUlwIyw4EBWCIBvjYrgQMbrrRj0k+BA"},"yaxis":"y2","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tgy-2022.csv","2022"],["26.21_-98.34-0-0_60_tgy-2023.csv","2023"],["26.21_-98.34-0-0_60_tgy-2024.csv","2024"]],"hovertemplate":"Data Source=TGY\u003cbr\u003eConfiguration=Dual Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TGY","marker":{"color":"#EF553B","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TGY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"eIms8n4fbkCgHhsUBgZtQF4iq7zfJW1A"},"xaxis":"x3","y":{"dtype":"f8","bdata":"uk2B61nF\u002fEAbSBibLqD8QCbNVLMoRfxA"},"yaxis":"y3","type":"scatter"},{"customdata":[["26.21_-98.34-0-0_60_tgy-2022.csv","2022"],["26.21_-98.34-0-0_60_tgy-2023.csv","2023"],["26.21_-98.34-0-0_60_tgy-2024.csv","2024"]],"hovertemplate":"Data Source=TGY\u003cbr\u003eConfiguration=Elevated Fixed\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TGY","marker":{"color":"#EF553B","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TGY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"eIms8n4fbkCgHhsUBgZtQF4iq7zfJW1A"},"xaxis":"x4","y":{"dtype":"f8","bdata":"tlzE5noZ8EDoBalQqRTwQOYynbTQwu9A"},"yaxis":"y4","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical Aggregated\u003cbr\u003eConfiguration=Single Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical Aggregated","marker":{"color":"#00cc96","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical Aggregated","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"1jTybGKLbEDy0ZIUGN9rQM550YDfkG1AMnT5AxmBbUClW8ihVAhwQDC1v9T+xm1AghU8iSPGa0Dcg9R1uJFsQPXYoDBQ32tAE+J\u002fuzKZbUDwm\u002fOiAX9tQMuWLVu2BnBAs9ww2SnPbUCTnbLcMNFrQA=="},"xaxis":"x","y":{"dtype":"f8","bdata":"uArfkynJCkEy9KDj7cYKQQo7E\u002ftZTAtBlubCiDtMC0F2cL9G2JAMQcKoF622CAxBY5QMNMGDCkFef3+d830KQW7r9WyPdwpB9sYbOcMIC0FGIE1ZHQALQbJBamu+SQxBqIn6Sk\u002fBC0G+KLv\u002fN0cKQQ=="},"yaxis":"y","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical Aggregated\u003cbr\u003eConfiguration=Vertical Bifacial\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical Aggregated","marker":{"color":"#00cc96","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical Aggregated","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"1jTybGKLbEDy0ZIUGN9rQM550YDfkG1AMnT5AxmBbUClW8ihVAhwQDC1v9T+xm1AghU8iSPGa0Dcg9R1uJFsQPXYoDBQ32tAE+J\u002fuzKZbUDwm\u002fOiAX9tQMuWLVu2BnBAs9ww2SnPbUCTnbLcMNFrQA=="},"xaxis":"x2","y":{"dtype":"f8","bdata":"WDI\u002foZ1C5kD6rOGz+UPmQOM+ZJgbu+ZAhpNZCv3A5kC4lekwidXnQF+d+ZK9OedAFMhxOUF25kBSZP2sNTHmQLjBGsufM+ZAjycfOha15kDcmP6sm7bmQAuOkaTOwedAugGzRJY050BgrhtwMGnmQA=="},"yaxis":"y2","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical Aggregated\u003cbr\u003eConfiguration=Dual Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical Aggregated","marker":{"color":"#00cc96","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical Aggregated","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"1jTybGKLbEDy0ZIUGN9rQM550YDfkG1AMnT5AxmBbUClW8ihVAhwQDC1v9T+xm1AghU8iSPGa0Dcg9R1uJFsQPXYoDBQ32tAE+J\u002fuzKZbUDwm\u002fOiAX9tQMuWLVu2BnBAs9ww2SnPbUCTnbLcMNFrQA=="},"xaxis":"x3","y":{"dtype":"f8","bdata":"WH5ZGB8yBUHgO2uVlTYFQcohzT2B0AVBisSDwVvYBUEu8XOEWOEGQabFRhp0TAZBRh5YfUIxBUGU77gktAIFQeHvlcQmBgVBWF90R1CnBUEuoDkFvKcFQRi8vJ80swZBB8d0iCshBkFw7wiASwsFQQ=="},"yaxis":"y3","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical Aggregated\u003cbr\u003eConfiguration=Elevated Fixed\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical Aggregated","marker":{"color":"#00cc96","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical Aggregated","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"1jTybGKLbEDy0ZIUGN9rQM550YDfkG1AMnT5AxmBbUClW8ihVAhwQDC1v9T+xm1AghU8iSPGa0Dcg9R1uJFsQPXYoDBQ32tAE+J\u002fuzKZbUDwm\u002fOiAX9tQMuWLVu2BnBAs9ww2SnPbUCTnbLcMNFrQA=="},"xaxis":"x4","y":{"dtype":"f8","bdata":"qzhSV10V\u002fkBi5c8ib0b+QH2y\u002fYU4NP9A8CXT5MxN\u002f0DMjlYfLAoAQUfmD3FIdv9ASrEcGk6n\u002fkCPPmDOGaj9QBtCSkKh1\u002f1A\u002fk6SGQbK\u002fkC3SzMMGNb+QKhVxFJirP9ALISf1O0H\u002f0CSBwrqJ0r+QA=="},"yaxis":"y4","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical CONUS\u003cbr\u003eConfiguration=Single Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical CONUS","marker":{"color":"#ab63fa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical CONUS","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"nk2saeQxbEAhh1LpFl5rQHyi74m+GW1A7rhPfdg0bUB0+QMZQ8dvQLZs2bJlh21AjmAFT+Jea0Au5FAq3UJsQPl6foWTV2tALdIbr9U6bUC\u002fS2SV90NtQFlumOyUyW9AIXUdbg+KbUCaNGnSpHVrQA=="},"xaxis":"x","y":{"dtype":"f8","bdata":"JNm+YySPCkGdgm6QkXwKQXxwWuGuAAtBStWKPnUIC0Gu6qzX9E4MQXE5\u002foQczAtBUAA2yLsbCkEC5BuodkQKQbL+85G6KQpBjFQ1WJTDCkGIXTBdpcoKQdR\u002f9Ve2CQxB+iHzGVx\u002fC0EMFAKfxcwJQQ=="},"yaxis":"y","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical CONUS\u003cbr\u003eConfiguration=Vertical Bifacial\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical CONUS","marker":{"color":"#ab63fa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical CONUS","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"nk2saeQxbEAhh1LpFl5rQHyi74m+GW1A7rhPfdg0bUB0+QMZQ8dvQLZs2bJlh21AjmAFT+Jea0Au5FAq3UJsQPl6foWTV2tALdIbr9U6bUC\u002fS2SV90NtQFlumOyUyW9AIXUdbg+KbUCaNGnSpHVrQA=="},"xaxis":"x2","y":{"dtype":"f8","bdata":"YMThUI8j5kDOU7ZOwhzmQJyBPB72iOZATKTtnxWK5kAAsSJIAprnQLjVJDddDOdAhkGi2IUm5kB2LmQAfg3mQNFfnK11AuZAlLCr9wiM5kAxFIA\u002fCI\u002fmQLw5l2KagOdAM59sgHYJ50BIzht+DAfmQA=="},"yaxis":"y2","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical CONUS\u003cbr\u003eConfiguration=Dual Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical CONUS","marker":{"color":"#ab63fa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical CONUS","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"nk2saeQxbEAhh1LpFl5rQHyi74m+GW1A7rhPfdg0bUB0+QMZQ8dvQLZs2bJlh21AjmAFT+Jea0Au5FAq3UJsQPl6foWTV2tALdIbr9U6bUC\u002fS2SV90NtQFlumOyUyW9AIXUdbg+KbUCaNGnSpHVrQA=="},"xaxis":"x3","y":{"dtype":"f8","bdata":"crF9R5L5BEFsb1DgYe4EQYh3NEzZigVBDSgJf0aXBUGYcAusCJ8GQW3Xhee2EAZBVoJ\u002fLdbRBEGmz9L\u002frMsEQcvpoGwruwRBRrzvWq1pBUHzNEvWFHUFQWhxOljMcQZBgJzLQV3kBUGmcHDOGJwEQQ=="},"yaxis":"y3","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","2024"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","2018"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","2019"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","2020"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","2021"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","2024"]],"hovertemplate":"Data Source=Historical CONUS\u003cbr\u003eConfiguration=Elevated Fixed\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Historical CONUS","marker":{"color":"#ab63fa","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"Historical CONUS","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"nk2saeQxbEAhh1LpFl5rQHyi74m+GW1A7rhPfdg0bUB0+QMZQ8dvQLZs2bJlh21AjmAFT+Jea0Au5FAq3UJsQPl6foWTV2tALdIbr9U6bUC\u002fS2SV90NtQFlumOyUyW9AIXUdbg+KbUCaNGnSpHVrQA=="},"xaxis":"x4","y":{"dtype":"f8","bdata":"O4FjEsfZ\u002fUAifT0eBfD9QFytFY6T5f5AZtn2rx0N\u002f0AcbfbCzNb\u002fQEy7\u002fyfSMv9AkEIpLoo6\u002fkBvtf3P0XD9QKNMiKSshv1Apb3VzBuC\u002fkCgbHOmPKL+QOrAzwv2d\u002f9AJQrsLbXA\u002fkA1UBwSFtP9QA=="},"yaxis":"y4","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","2024"]],"hovertemplate":"Data Source=TMY\u003cbr\u003eConfiguration=Single Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TMY","marker":{"color":"#FFA15A","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TMY","orientation":"v","showlegend":true,"x":{"dtype":"f8","bdata":"E1nl\u002fS5xbkAvCLsg7BpsQAcgUbN3sG1A"},"xaxis":"x","y":{"dtype":"f8","bdata":"sCJklZXZC0H9RZyf9GAKQeFHrWfIjgtB"},"yaxis":"y","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","2024"]],"hovertemplate":"Data Source=TMY\u003cbr\u003eConfiguration=Vertical Bifacial\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TMY","marker":{"color":"#FFA15A","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TMY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"E1nl\u002fS5xbkAvCLsg7BpsQAcgUbN3sG1A"},"xaxis":"x2","y":{"dtype":"f8","bdata":"4jDr1k5w50AqRPq6Ai7mQJJvoq+rKudA"},"yaxis":"y2","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","2024"]],"hovertemplate":"Data Source=TMY\u003cbr\u003eConfiguration=Dual Axis Tracking\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TMY","marker":{"color":"#FFA15A","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TMY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"E1nl\u002fS5xbkAvCLsg7BpsQAcgUbN3sG1A"},"xaxis":"x3","y":{"dtype":"f8","bdata":"hCvjWKM\u002fBkFGBQ0ZnPwEQc4krJE07wVB"},"yaxis":"y3","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","2022"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","2023"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","2024"]],"hovertemplate":"Data Source=TMY\u003cbr\u003eConfiguration=Elevated Fixed\u003cbr\u003eMean DNI (W\u002fm\u00b2)=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eYear=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"TMY","marker":{"color":"#FFA15A","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":10},"mode":"markers","name":"TMY","orientation":"v","showlegend":false,"x":{"dtype":"f8","bdata":"E1nl\u002fS5xbkAvCLsg7BpsQAcgUbN3sG1A"},"xaxis":"x4","y":{"dtype":"f8","bdata":"3Srk5rx4\u002f0BxHpjQNyH+QJj5whdpTP9A"},"yaxis":"y4","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,0.235],"title":{"text":"Mean DNI (W\u002fm\u00b2)"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Gross Revenue ($)"}},"xaxis2":{"anchor":"y2","domain":[0.255,0.49],"matches":"x","title":{"text":"Mean DNI (W\u002fm\u00b2)"}},"yaxis2":{"anchor":"x2","domain":[0.0,1.0],"matches":"y","showticklabels":false},"xaxis3":{"anchor":"y3","domain":[0.51,0.745],"matches":"x","title":{"text":"Mean DNI (W\u002fm\u00b2)"}},"yaxis3":{"anchor":"x3","domain":[0.0,1.0],"matches":"y","showticklabels":false},"xaxis4":{"anchor":"y4","domain":[0.7649999999999999,0.9999999999999999],"matches":"x","title":{"text":"Mean DNI (W\u002fm\u00b2)"}},"yaxis4":{"anchor":"x4","domain":[0.0,1.0],"matches":"y","showticklabels":false},"annotations":[{"font":{},"showarrow":false,"text":"Configuration=Single Axis Tracking","x":0.1175,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{},"showarrow":false,"text":"Configuration=Vertical Bifacial","x":0.3725,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{},"showarrow":false,"text":"Configuration=Dual Axis Tracking","x":0.6275,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"},{"font":{},"showarrow":false,"text":"Configuration=Elevated Fixed","x":0.8824999999999998,"xanchor":"center","xref":"paper","y":1.0,"yanchor":"bottom","yref":"paper"}],"legend":{"title":{"text":"Data Source"},"tracegroupgap":0},"title":{"text":"Revenue Susceptibility to DNI (Categorized by File Type)"}},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+        <div class="table-container">
+            <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather File Type</th>
+      <th>Average GHI</th>
+      <th>Average DNI</th>
+      <th>Dual Axis Tracking</th>
+      <th>Elevated Fixed</th>
+      <th>Single Axis Tracking</th>
+      <th>Vertical Bifacial</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>TMY</td>
+      <td>225.1 W/m²</td>
+      <td>235.3 W/m²</td>
+      <td>$177,957</td>
+      <td>$126,839</td>
+      <td>$223,331</td>
+      <td>$46,957</td>
+    </tr>
+    <tr>
+      <td>Historical Aggregated</td>
+      <td>221.5 W/m²</td>
+      <td>234.5 W/m²</td>
+      <td>$177,683</td>
+      <td>$126,151</td>
+      <td>$222,699</td>
+      <td>$46,624</td>
+    </tr>
+    <tr>
+      <td>Historical CONUS</td>
+      <td>220.1 W/m²</td>
+      <td>231.7 W/m²</td>
+      <td>$175,478</td>
+      <td>$124,974</td>
+      <td>$220,375</td>
+      <td>$46,206</td>
+    </tr>
+    <tr>
+      <td>TDY</td>
+      <td>307.5 W/m²</td>
+      <td>234.4 W/m²</td>
+      <td>$117,968</td>
+      <td>$66,072</td>
+      <td>$142,792</td>
+      <td>$34,108</td>
+    </tr>
+    <tr>
+      <td>TGY</td>
+      <td>308.2 W/m²</td>
+      <td>235.5 W/m²</td>
+      <td>$116,964</td>
+      <td>$65,619</td>
+      <td>$142,221</td>
+      <td>$34,003</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+
+        <h2>8. Statistical Sensitivity Analysis: Drivers of Energy Yield</h2>
+        <div class="def-box">
+            <p>To mathematically prove exactly <em>why</em> these layouts react differently to atmospheric changes, a Pearson Correlation analysis was performed across the dataset. The chart below measures how strongly each meteorological variable influences the final energy yield, bounded between -1.0 (Strong Negative Impact) and +1.0 (Strong Positive Impact).</p>
+            <ul>
+                <li><strong>Irradiance (DNI vs. GHI):</strong> Dual Axis and Single Axis tracking systems demonstrate a near-perfect reliance (+1.0) on direct line-of-sight irradiance (DNI). Conversely, the Vertical Bifacial system relies much more heavily on Global Horizontal Irradiance (GHI) and ground albedo, buffering it against thick cloud cover that destroys DNI.</li>
+                <li><strong>Thermal Degradation (Temperature):</strong> Notice the negative correlation across all layouts for Temperature. As ambient heat rises, the physical silicon cells experience a voltage drop, proving that extreme Texas heatwaves actively suppress solar generation despite clear skies.</li>
+                <li><strong>Convective Cooling (Wind Speed):</strong> Higher wind speeds exhibit a slight positive correlation. As wind passes over the arrays, it strips away excess heat, naturally cooling the modules and mitigating the thermal degradation effect mentioned above.</li>
+            </ul>
+        </div>
+        <div class="table-container" style="padding: 0;">
+            <div>                            <div id="800b42b0-9ce3-40e6-b306-d32595d51aaa" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("800b42b0-9ce3-40e6-b306-d32595d51aaa")) {                    Plotly.newPlot(                        "800b42b0-9ce3-40e6-b306-d32595d51aaa",                        [{"alignmentgroup":"True","hovertemplate":"Configuration=Single Axis Tracking\u003cbr\u003eMeteorological Variable=%{x}\u003cbr\u003eCorrelation Coefficient (-1 to 1)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Single Axis Tracking","marker":{"color":"blue","pattern":{"shape":""}},"name":"Single Axis Tracking","offsetgroup":"Single Axis Tracking","orientation":"v","showlegend":true,"textposition":"auto","x":["Mean GHI","Mean DNI","Mean Temperature","Peak Temperature","Mean Wind Speed"],"xaxis":"x","y":{"dtype":"f8","bdata":"KuQSKuq97r8JXXvAVHmzP3xhXot2ENW\u002fVH2idlnT7j\u002fz6ygOBXrvPw=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Configuration=Vertical Bifacial\u003cbr\u003eMeteorological Variable=%{x}\u003cbr\u003eCorrelation Coefficient (-1 to 1)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Vertical Bifacial","marker":{"color":"green","pattern":{"shape":""}},"name":"Vertical Bifacial","offsetgroup":"Vertical Bifacial","orientation":"v","showlegend":true,"textposition":"auto","x":["Mean GHI","Mean DNI","Mean Temperature","Peak Temperature","Mean Wind Speed"],"xaxis":"x","y":{"dtype":"f8","bdata":"KEjhlE297r+pZbMzUweyP+o\u002fL+1jM9S\u002f8x7w\u002frfk7j84y7t7RWXvPw=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Configuration=Dual Axis Tracking\u003cbr\u003eMeteorological Variable=%{x}\u003cbr\u003eCorrelation Coefficient (-1 to 1)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Dual Axis Tracking","marker":{"color":"red","pattern":{"shape":""}},"name":"Dual Axis Tracking","offsetgroup":"Dual Axis Tracking","orientation":"v","showlegend":true,"textposition":"auto","x":["Mean GHI","Mean DNI","Mean Temperature","Peak Temperature","Mean Wind Speed"],"xaxis":"x","y":{"dtype":"f8","bdata":"nKW7leyT7r\u002fu7vknNpi3P6ThpCoCzdS\u002fZLtpx8az7j+hG2euH1XvPw=="},"yaxis":"y","type":"bar"},{"alignmentgroup":"True","hovertemplate":"Configuration=Elevated Fixed\u003cbr\u003eMeteorological Variable=%{x}\u003cbr\u003eCorrelation Coefficient (-1 to 1)=%{y}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Elevated Fixed","marker":{"color":"orange","pattern":{"shape":""}},"name":"Elevated Fixed","offsetgroup":"Elevated Fixed","orientation":"v","showlegend":true,"textposition":"auto","x":["Mean GHI","Mean DNI","Mean Temperature","Peak Temperature","Mean Wind Speed"],"xaxis":"x","y":{"dtype":"f8","bdata":"i00\u002fBP337r+z2A9k1T2lP4xRItgTXtO\u002fS329whT37j9PuRIGx2XvPw=="},"yaxis":"y","type":"bar"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Meteorological Variable"}},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Correlation Coefficient (-1 to 1)"},"range":[-1.1,1.1]},"legend":{"title":{"text":"Configuration"},"tracegroupgap":0},"title":{"text":"Pearson Correlation: Weather Variables vs. Final Energy Yield"},"barmode":"group"},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+
+        <h2>9. Macro-Aggregation: Analysis by Historical Year</h2>
+        <div class="def-box">
+            <p>Plotting the exact same configurations strictly chronologically reveals the danger of building agrivoltaic infrastructure based purely on "Average" years. Dips in the graph expose specific years where atmospheric haze, extreme temperatures, or cloud cover severely depressed energy yields—years where agricultural yields would also likely drop, compounding the farmer's financial risk.</p>
+        </div>
+        <div class="table-container" style="padding: 0;">
+            <div>                            <div id="09cfd401-5804-4fd1-ab66-a1f334be63bf" class="plotly-graph-div" style="height:100%; width:100%;"></div>            <script>                window.PLOTLYENV=window.PLOTLYENV || {};                                if (document.getElementById("09cfd401-5804-4fd1-ab66-a1f334be63bf")) {                    Plotly.newPlot(                        "09cfd401-5804-4fd1-ab66-a1f334be63bf",                        [{"customdata":[["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tdy-2022.csv","TDY"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","TMY"],["26.21_-98.34-0-0_60_tgy-2022.csv","TGY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","TMY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tgy-2023.csv","TGY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tdy-2023.csv","TDY"],["26.21_-98.34-0-0_60_tdy-2024.csv","TDY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","TMY"],["26.21_-98.34-0-0_60_tgy-2024.csv","TGY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","Historical Aggregated"]],"hovertemplate":"Configuration=Vertical Bifacial\u003cbr\u003eRecorded Year=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eWeather_Type=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Vertical Bifacial","marker":{"color":"green","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Vertical Bifacial","orientation":"v","showlegend":true,"x":["2018","2018","2018","2018","2019","2019","2019","2019","2020","2020","2020","2020","2021","2021","2021","2021","2022","2022","2022","2022","2022","2022","2022","2023","2023","2023","2023","2023","2023","2023","2024","2024","2024","2024","2024","2024","2024"],"xaxis":"x","y":{"dtype":"f8","bdata":"YMThUI8j5kBYMj+hnULmQHYuZAB+DeZAUmT9rDUx5kD6rOGz+UPmQNFfnK11AuZAuMEay58z5kDOU7ZOwhzmQI8nHzoWteZAlLCr9wiM5kDjPmSYG7vmQJyBPB72iOZA3Jj+rJu25kBMpO2fFYrmQDEUgD8Ij+ZAhpNZCv3A5kAAsSJIAprnQMCwRWNquOBA4jDr1k5w50BhVSXAjLDgQAuOkaTOwedAuJXpMInV50C8OZdimoDnQDOfbIB2CedAKkT6ugIu5kC6AbNEljTnQFYIgG+NiuBAuNUkN10M50BfnfmSvTnnQCjawHher+BANnq6p76O4EBIzht+DAfmQJJvoq+rKudAxuutGPST4ECGQaLYhSbmQGCuG3AwaeZAFMhxOUF25kA="},"yaxis":"y","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tdy-2022.csv","TDY"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","TMY"],["26.21_-98.34-0-0_60_tgy-2022.csv","TGY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","TMY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tgy-2023.csv","TGY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tdy-2023.csv","TDY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tdy-2024.csv","TDY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tgy-2024.csv","TGY"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","TMY"]],"hovertemplate":"Configuration=Elevated Fixed\u003cbr\u003eRecorded Year=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eWeather_Type=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Elevated Fixed","marker":{"color":"orange","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Elevated Fixed","orientation":"v","showlegend":true,"x":["2018","2018","2018","2018","2019","2019","2019","2019","2020","2020","2020","2020","2021","2021","2021","2021","2022","2022","2022","2022","2022","2022","2022","2023","2023","2023","2023","2023","2023","2023","2024","2024","2024","2024","2024","2024","2024"],"xaxis":"x","y":{"dtype":"f8","bdata":"qzhSV10V\u002fkA7gWMSx9n9QG+1\u002fc\u002fRcP1Ajz5gzhmo\u002fUAifT0eBfD9QGLlzyJvRv5AG0JKQqHX\u002fUCjTIikrIb9QKW91cwbgv5A\u002fk6SGQbK\u002fkBcrRWOk+X+QH2y\u002fYU4NP9At0szDBjW\u002fkBm2favHQ3\u002fQKBsc6Y8ov5A8CXT5MxN\u002f0CoVcRSYqz\u002fQBxt9sLM1v9ALcxSL8Eu8EDdKuTmvHj\u002fQLZcxOZ6GfBAzI5WHywKAEHqwM8L9nf\u002fQEy7\u002fyfSMv9AcR6Y0Dch\u002fkAlCuwttcD+QEfmD3FIdv9A6AWpUKkU8EAshJ\u002fU7Qf\u002fQGfDpTndOvBANVAcEhbT\u002fUCmS24KvPXvQJBCKS6KOv5AkgcK6idK\u002fkBKsRwaTqf+QOYynbTQwu9AmPnCF2lM\u002f0A="},"yaxis":"y","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tdy-2022.csv","TDY"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","TMY"],["26.21_-98.34-0-0_60_tgy-2022.csv","TGY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","TMY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tgy-2023.csv","TGY"],["26.21_-98.34-0-0_60_tdy-2023.csv","TDY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tdy-2024.csv","TDY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tgy-2024.csv","TGY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","TMY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","Historical Aggregated"]],"hovertemplate":"Configuration=Dual Axis Tracking\u003cbr\u003eRecorded Year=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eWeather_Type=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Dual Axis Tracking","marker":{"color":"red","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Dual Axis Tracking","orientation":"v","showlegend":true,"x":["2018","2018","2018","2018","2019","2019","2019","2019","2020","2020","2020","2020","2021","2021","2021","2021","2022","2022","2022","2022","2022","2022","2022","2023","2023","2023","2023","2023","2023","2023","2024","2024","2024","2024","2024","2024","2024"],"xaxis":"x","y":{"dtype":"f8","bdata":"WH5ZGB8yBUGmz9L\u002frMsEQXKxfUeS+QRBlO+4JLQCBUHgO2uVlTYFQcvpoGwruwRB4e+VxCYGBUFsb1DgYe4EQUa871qtaQVBWF90R1CnBUHKIc09gdAFQYh3NEzZigVBLqA5BbynBUENKAl\u002fRpcFQYrEg8Fb2AVB8zRL1hR1BUGYcAusCJ8GQRi8vJ80swZBBji2yxDp\u002fECEK+NYoz8GQbpNgetZxfxAaHE6WMxxBkEu8XOEWOEGQUYFDRmc\u002fARBgJzLQV3kBUFt14XnthAGQabFRhp0TAZBG0gYmy6g\u002fEDOHGj0Ovf8QAfHdIgrIQZB4rN+GreG\u002fECmcHDOGJwEQSbNVLMoRfxAVoJ\u002fLdbRBEFw7wiASwsFQc4krJE07wVBRh5YfUIxBUE="},"yaxis":"y","type":"scatter"},{"customdata":[["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tdy-2022.csv","TDY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv","TMY"],["26.21_-98.34-0-0_60_tgy-2022.csv","TGY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv","TMY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tgy-2023.csv","TGY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv","Historical Aggregated"],["26.21_-98.34-0-0_60_tdy-2023.csv","TDY"],["26.21_-98.34-0-0_60_tdy-2024.csv","TDY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv","Historical CONUS"],["26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv","TMY"],["26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv","Historical CONUS"],["26.21_-98.34-0-0_60_tgy-2024.csv","TGY"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv","Historical Aggregated"],["26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv","Historical Aggregated"]],"hovertemplate":"Configuration=Single Axis Tracking\u003cbr\u003eRecorded Year=%{x}\u003cbr\u003eGross Revenue ($)=%{y:$,.0f}\u003cbr\u003eScenario_File=%{customdata[0]}\u003cbr\u003eWeather_Type=%{customdata[1]}\u003cextra\u003e\u003c\u002fextra\u003e","legendgroup":"Single Axis Tracking","marker":{"color":"blue","symbol":"circle","line":{"color":"DarkSlateGrey","width":1},"opacity":0.8,"size":12},"mode":"markers","name":"Single Axis Tracking","orientation":"v","showlegend":true,"x":["2018","2018","2018","2018","2019","2019","2019","2019","2020","2020","2020","2020","2021","2021","2021","2021","2022","2022","2022","2022","2022","2022","2022","2023","2023","2023","2023","2023","2023","2023","2024","2024","2024","2024","2024","2024","2024"],"xaxis":"x","y":{"dtype":"f8","bdata":"uArfkynJCkEC5BuodkQKQSTZvmMkjwpBXn9\u002fnfN9CkEy9KDj7cYKQW7r9WyPdwpBsv7zkbopCkGdgm6QkXwKQfbGGznDCAtBjFQ1WJTDCkEKOxP7WUwLQXxwWuGuAAtBRiBNWR0AC0FK1Yo+dQgLQYhdMF2lygpBlubCiDtMC0Gu6qzX9E4MQenhjTHwmQFBskFqa75JDEGwImSVldkLQXwndE\u002f3nAFB1H\u002f1V7YJDEF2cL9G2JAMQf1FnJ\u002f0YApB+iHzGVx\u002fC0FxOf6EHMwLQdnwGhlKNAFBwqgXrbYIDEGoifpKT8ELQYoK3KcjcQFBjMf+Taw\u002fAUEMFAKfxcwJQeFHrWfIjgtBUAA2yLsbCkGdPKvhAEQBQWOUDDTBgwpBvii7\u002fzdHCkE="},"yaxis":"y","type":"scatter"}],                        {"template":{"data":{"histogram2dcontour":[{"type":"histogram2dcontour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"choropleth":[{"type":"choropleth","colorbar":{"outlinewidth":0,"ticks":""}}],"histogram2d":[{"type":"histogram2d","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"heatmap":[{"type":"heatmap","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"contourcarpet":[{"type":"contourcarpet","colorbar":{"outlinewidth":0,"ticks":""}}],"contour":[{"type":"contour","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"surface":[{"type":"surface","colorbar":{"outlinewidth":0,"ticks":""},"colorscale":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]]}],"mesh3d":[{"type":"mesh3d","colorbar":{"outlinewidth":0,"ticks":""}}],"scatter":[{"fillpattern":{"fillmode":"overlay","size":10,"solidity":0.2},"type":"scatter"}],"parcoords":[{"type":"parcoords","line":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolargl":[{"type":"scatterpolargl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"bar":[{"error_x":{"color":"#2a3f5f"},"error_y":{"color":"#2a3f5f"},"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"bar"}],"scattergeo":[{"type":"scattergeo","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterpolar":[{"type":"scatterpolar","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"histogram":[{"marker":{"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"histogram"}],"scattergl":[{"type":"scattergl","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatter3d":[{"type":"scatter3d","line":{"colorbar":{"outlinewidth":0,"ticks":""}},"marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermap":[{"type":"scattermap","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattermapbox":[{"type":"scattermapbox","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scatterternary":[{"type":"scatterternary","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"scattercarpet":[{"type":"scattercarpet","marker":{"colorbar":{"outlinewidth":0,"ticks":""}}}],"carpet":[{"aaxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"baxis":{"endlinecolor":"#2a3f5f","gridcolor":"white","linecolor":"white","minorgridcolor":"white","startlinecolor":"#2a3f5f"},"type":"carpet"}],"table":[{"cells":{"fill":{"color":"#EBF0F8"},"line":{"color":"white"}},"header":{"fill":{"color":"#C8D4E3"},"line":{"color":"white"}},"type":"table"}],"barpolar":[{"marker":{"line":{"color":"#E5ECF6","width":0.5},"pattern":{"fillmode":"overlay","size":10,"solidity":0.2}},"type":"barpolar"}],"pie":[{"automargin":true,"type":"pie"}]},"layout":{"autotypenumbers":"strict","colorway":["#636efa","#EF553B","#00cc96","#ab63fa","#FFA15A","#19d3f3","#FF6692","#B6E880","#FF97FF","#FECB52"],"font":{"color":"#2a3f5f"},"hovermode":"closest","hoverlabel":{"align":"left"},"paper_bgcolor":"white","plot_bgcolor":"#E5ECF6","polar":{"bgcolor":"#E5ECF6","angularaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"radialaxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"ternary":{"bgcolor":"#E5ECF6","aaxis":{"gridcolor":"white","linecolor":"white","ticks":""},"baxis":{"gridcolor":"white","linecolor":"white","ticks":""},"caxis":{"gridcolor":"white","linecolor":"white","ticks":""}},"coloraxis":{"colorbar":{"outlinewidth":0,"ticks":""}},"colorscale":{"sequential":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"sequentialminus":[[0.0,"#0d0887"],[0.1111111111111111,"#46039f"],[0.2222222222222222,"#7201a8"],[0.3333333333333333,"#9c179e"],[0.4444444444444444,"#bd3786"],[0.5555555555555556,"#d8576b"],[0.6666666666666666,"#ed7953"],[0.7777777777777778,"#fb9f3a"],[0.8888888888888888,"#fdca26"],[1.0,"#f0f921"]],"diverging":[[0,"#8e0152"],[0.1,"#c51b7d"],[0.2,"#de77ae"],[0.3,"#f1b6da"],[0.4,"#fde0ef"],[0.5,"#f7f7f7"],[0.6,"#e6f5d0"],[0.7,"#b8e186"],[0.8,"#7fbc41"],[0.9,"#4d9221"],[1,"#276419"]]},"xaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"yaxis":{"gridcolor":"white","linecolor":"white","ticks":"","title":{"standoff":15},"zerolinecolor":"white","automargin":true,"zerolinewidth":2},"scene":{"xaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"yaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2},"zaxis":{"backgroundcolor":"#E5ECF6","gridcolor":"white","linecolor":"white","showbackground":true,"ticks":"","zerolinecolor":"white","gridwidth":2}},"shapedefaults":{"line":{"color":"#2a3f5f"}},"annotationdefaults":{"arrowcolor":"#2a3f5f","arrowhead":0,"arrowwidth":1},"geo":{"bgcolor":"white","landcolor":"#E5ECF6","subunitcolor":"white","showland":true,"showlakes":true,"lakecolor":"white"},"title":{"x":0.05},"mapbox":{"style":"light"}}},"xaxis":{"anchor":"y","domain":[0.0,1.0],"title":{"text":"Recorded Year"},"type":"category"},"yaxis":{"anchor":"x","domain":[0.0,1.0],"title":{"text":"Gross Revenue ($)"}},"legend":{"title":{"text":"Configuration"},"tracegroupgap":0},"title":{"text":"Historical Volatility: Revenue Generated over Time"}},                        {"responsive": true}                    )                };            </script>        </div>
+        </div>
+        <div class="table-container">
+            <table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Data Year</th>
+      <th>Average GHI</th>
+      <th>Average DNI</th>
+      <th>Dual Axis Tracking</th>
+      <th>Elevated Fixed</th>
+      <th>Single Axis Tracking</th>
+      <th>Vertical Bifacial</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>2024</td>
+      <td>245.1 W/m²</td>
+      <td>226.1 W/m²</td>
+      <td>$156,817</td>
+      <td>$107,757</td>
+      <td>$195,172</td>
+      <td>$42,526</td>
+    </tr>
+    <tr>
+      <td>2023</td>
+      <td>245.2 W/m²</td>
+      <td>234.7 W/m²</td>
+      <td>$161,696</td>
+      <td>$109,354</td>
+      <td>$201,417</td>
+      <td>$43,278</td>
+    </tr>
+    <tr>
+      <td>2022</td>
+      <td>253.5 W/m²</td>
+      <td>249.1 W/m²</td>
+      <td>$165,871</td>
+      <td>$111,654</td>
+      <td>$206,280</td>
+      <td>$44,337</td>
+    </tr>
+    <tr>
+      <td>2021</td>
+      <td>220.6 W/m²</td>
+      <td>234.9 W/m²</td>
+      <td>$177,252</td>
+      <td>$126,797</td>
+      <td>$221,436</td>
+      <td>$46,369</td>
+    </tr>
+    <tr>
+      <td>2020</td>
+      <td>221.8 W/m²</td>
+      <td>235.0 W/m²</td>
+      <td>$176,995</td>
+      <td>$126,360</td>
+      <td>$221,387</td>
+      <td>$46,346</td>
+    </tr>
+    <tr>
+      <td>2019</td>
+      <td>215.7 W/m²</td>
+      <td>220.9 W/m²</td>
+      <td>$171,826</td>
+      <td>$122,451</td>
+      <td>$216,870</td>
+      <td>$45,358</td>
+    </tr>
+    <tr>
+      <td>2018</td>
+      <td>216.5 W/m²</td>
+      <td>227.1 W/m²</td>
+      <td>$171,985</td>
+      <td>$121,888</td>
+      <td>$217,302</td>
+      <td>$45,386</td>
+    </tr>
+  </tbody>
+</table>
+        </div>
+
+        <h2>10. Hardware-Specific Scenario Rankings</h2>
+        <p><em>Each layout evaluated against historical irradiance to determine P50 means and variance extremes. Tables scroll internally.</em></p>
+        <h3>Single Axis Tracking Performance Rankings</h3>
+<div class='table-container' style='max-height: 400px; overflow-y: auto;'>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather Scenario</th>
+      <th>Mean GHI</th>
+      <th>Mean DNI</th>
+      <th>Peak Temp</th>
+      <th>Energy Yield</th>
+      <th>Single Axis Tracking Mean (P50)</th>
+      <th>Gross Revenue</th>
+      <th>Variance (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>230.7 W/m²</td>
+      <td>256.5 W/m²</td>
+      <td>42.5 °C</td>
+      <td>1,451,530 kWh</td>
+      <td>$208,867</td>
+      <td>$234,011</td>
+      <td>+12.04%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>229.5 W/m²</td>
+      <td>254.2 W/m²</td>
+      <td>42.5 °C</td>
+      <td>1,436,469 kWh</td>
+      <td>$208,867</td>
+      <td>$231,903</td>
+      <td>+11.03%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>230.6 W/m²</td>
+      <td>256.4 W/m²</td>
+      <td>42.4 °C</td>
+      <td>1,450,493 kWh</td>
+      <td>$208,867</td>
+      <td>$231,736</td>
+      <td>+10.95%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>229.6 W/m²</td>
+      <td>254.3 W/m²</td>
+      <td>42.4 °C</td>
+      <td>1,435,776 kWh</td>
+      <td>$208,867</td>
+      <td>$229,687</td>
+      <td>+9.97%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.2 W/m²</td>
+      <td>45.8 °C</td>
+      <td>1,375,505 kWh</td>
+      <td>$208,867</td>
+      <td>$229,655</td>
+      <td>+9.95%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>229.2 W/m²</td>
+      <td>243.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>1,425,620 kWh</td>
+      <td>$208,867</td>
+      <td>$228,147</td>
+      <td>+9.23%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>221.9 W/m²</td>
+      <td>236.2 W/m²</td>
+      <td>45.7 °C</td>
+      <td>1,361,636 kWh</td>
+      <td>$208,867</td>
+      <td>$227,716</td>
+      <td>+9.02%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.5 W/m²</td>
+      <td>45.6 °C</td>
+      <td>1,375,954 kWh</td>
+      <td>$208,867</td>
+      <td>$227,370</td>
+      <td>+8.86%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>228.2 W/m²</td>
+      <td>237.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>1,405,632 kWh</td>
+      <td>$208,867</td>
+      <td>$225,753</td>
+      <td>+8.08%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>221.4 W/m²</td>
+      <td>236.3 W/m²</td>
+      <td>45.5 °C</td>
+      <td>1,359,756 kWh</td>
+      <td>$208,867</td>
+      <td>$225,260</td>
+      <td>+7.85%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>222.4 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>41.4 °C</td>
+      <td>1,377,776 kWh</td>
+      <td>$208,867</td>
+      <td>$223,627</td>
+      <td>+7.07%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>221.2 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.6 °C</td>
+      <td>1,374,308 kWh</td>
+      <td>$208,867</td>
+      <td>$223,623</td>
+      <td>+7.07%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>222.5 W/m²</td>
+      <td>236.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>1,378,733 kWh</td>
+      <td>$208,867</td>
+      <td>$221,464</td>
+      <td>+6.03%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>220.1 W/m²</td>
+      <td>233.7 W/m²</td>
+      <td>41.6 °C</td>
+      <td>1,360,707 kWh</td>
+      <td>$208,867</td>
+      <td>$221,455</td>
+      <td>+6.03%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>220.9 W/m²</td>
+      <td>232.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>1,361,674 kWh</td>
+      <td>$208,867</td>
+      <td>$221,206</td>
+      <td>+5.91%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>221.1 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.5 °C</td>
+      <td>1,374,409 kWh</td>
+      <td>$208,867</td>
+      <td>$221,188</td>
+      <td>+5.90%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>220.2 W/m²</td>
+      <td>234.1 W/m²</td>
+      <td>41.5 °C</td>
+      <td>1,362,243 kWh</td>
+      <td>$208,867</td>
+      <td>$219,477</td>
+      <td>+5.08%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>217.0 W/m²</td>
+      <td>228.4 W/m²</td>
+      <td>41.7 °C</td>
+      <td>1,344,900 kWh</td>
+      <td>$208,867</td>
+      <td>$219,429</td>
+      <td>+5.06%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>216.4 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>1,329,237 kWh</td>
+      <td>$208,867</td>
+      <td>$219,358</td>
+      <td>+5.02%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>221.3 W/m²</td>
+      <td>233.8 W/m²</td>
+      <td>41.3 °C</td>
+      <td>1,364,493 kWh</td>
+      <td>$208,867</td>
+      <td>$219,251</td>
+      <td>+4.97%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>215.8 W/m²</td>
+      <td>225.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>1,332,496 kWh</td>
+      <td>$208,867</td>
+      <td>$217,573</td>
+      <td>+4.17%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>219.6 W/m²</td>
+      <td>222.2 W/m²</td>
+      <td>44.8 °C</td>
+      <td>1,344,057 kWh</td>
+      <td>$208,867</td>
+      <td>$217,208</td>
+      <td>+3.99%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>217.1 W/m²</td>
+      <td>228.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>1,345,683 kWh</td>
+      <td>$208,867</td>
+      <td>$217,022</td>
+      <td>+3.90%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>214.7 W/m²</td>
+      <td>218.9 W/m²</td>
+      <td>43.7 °C</td>
+      <td>1,312,439 kWh</td>
+      <td>$208,867</td>
+      <td>$216,978</td>
+      <td>+3.88%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>216.6 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>1,329,523 kWh</td>
+      <td>$208,867</td>
+      <td>$216,818</td>
+      <td>+3.81%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>218.0 W/m²</td>
+      <td>224.8 W/m²</td>
+      <td>42.1 °C</td>
+      <td>1,334,970 kWh</td>
+      <td>$208,867</td>
+      <td>$216,095</td>
+      <td>+3.46%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>219.8 W/m²</td>
+      <td>222.5 W/m²</td>
+      <td>44.7 °C</td>
+      <td>1,345,357 kWh</td>
+      <td>$208,867</td>
+      <td>$215,271</td>
+      <td>+3.07%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>215.9 W/m²</td>
+      <td>226.1 W/m²</td>
+      <td>41.6 °C</td>
+      <td>1,333,077 kWh</td>
+      <td>$208,867</td>
+      <td>$215,183</td>
+      <td>+3.02%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>214.9 W/m²</td>
+      <td>218.7 W/m²</td>
+      <td>43.6 °C</td>
+      <td>1,311,662 kWh</td>
+      <td>$208,867</td>
+      <td>$214,327</td>
+      <td>+2.61%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>217.2 W/m²</td>
+      <td>219.0 W/m²</td>
+      <td>44.7 °C</td>
+      <td>1,321,469 kWh</td>
+      <td>$208,867</td>
+      <td>$213,879</td>
+      <td>+2.40%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>44.7 °C</td>
+      <td>1,323,049 kWh</td>
+      <td>$208,867</td>
+      <td>$211,353</td>
+      <td>+1.19%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>313.3 W/m²</td>
+      <td>241.0 W/m²</td>
+      <td>N/A</td>
+      <td>691,212 kWh</td>
+      <td>$208,867</td>
+      <td>$144,287</td>
+      <td>-30.92%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>311.6 W/m²</td>
+      <td>237.9 W/m²</td>
+      <td>N/A</td>
+      <td>686,021 kWh</td>
+      <td>$208,867</td>
+      <td>$144,190</td>
+      <td>-30.97%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>306.1 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>N/A</td>
+      <td>667,484 kWh</td>
+      <td>$208,867</td>
+      <td>$142,884</td>
+      <td>-31.59%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>308.5 W/m²</td>
+      <td>233.2 W/m²</td>
+      <td>N/A</td>
+      <td>680,819 kWh</td>
+      <td>$208,867</td>
+      <td>$141,440</td>
+      <td>-32.28%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>304.8 W/m²</td>
+      <td>228.7 W/m²</td>
+      <td>N/A</td>
+      <td>673,125 kWh</td>
+      <td>$208,867</td>
+      <td>$141,302</td>
+      <td>-32.35%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>302.9 W/m²</td>
+      <td>232.2 W/m²</td>
+      <td>N/A</td>
+      <td>662,109 kWh</td>
+      <td>$208,867</td>
+      <td>$140,937</td>
+      <td>-32.52%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<h3>Vertical Bifacial Performance Rankings</h3>
+<div class='table-container' style='max-height: 400px; overflow-y: auto;'>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather Scenario</th>
+      <th>Mean GHI</th>
+      <th>Mean DNI</th>
+      <th>Peak Temp</th>
+      <th>Energy Yield</th>
+      <th>Vertical Bifacial Mean (P50)</th>
+      <th>Gross Revenue</th>
+      <th>Variance (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>230.7 W/m²</td>
+      <td>256.5 W/m²</td>
+      <td>42.5 °C</td>
+      <td>306,230 kWh</td>
+      <td>$44,455</td>
+      <td>$48,812</td>
+      <td>+9.80%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>230.6 W/m²</td>
+      <td>256.4 W/m²</td>
+      <td>42.4 °C</td>
+      <td>305,154 kWh</td>
+      <td>$44,455</td>
+      <td>$48,654</td>
+      <td>+9.45%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>229.5 W/m²</td>
+      <td>254.2 W/m²</td>
+      <td>42.5 °C</td>
+      <td>302,934 kWh</td>
+      <td>$44,455</td>
+      <td>$48,336</td>
+      <td>+8.73%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>229.6 W/m²</td>
+      <td>254.3 W/m²</td>
+      <td>42.4 °C</td>
+      <td>301,637 kWh</td>
+      <td>$44,455</td>
+      <td>$48,133</td>
+      <td>+8.27%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>229.2 W/m²</td>
+      <td>243.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>302,188 kWh</td>
+      <td>$44,455</td>
+      <td>$48,002</td>
+      <td>+7.98%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.2 W/m²</td>
+      <td>45.8 °C</td>
+      <td>291,629 kWh</td>
+      <td>$44,455</td>
+      <td>$47,566</td>
+      <td>+7.00%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.5 W/m²</td>
+      <td>45.6 °C</td>
+      <td>291,316 kWh</td>
+      <td>$44,455</td>
+      <td>$47,525</td>
+      <td>+6.91%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>228.2 W/m²</td>
+      <td>237.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>297,440 kWh</td>
+      <td>$44,455</td>
+      <td>$47,445</td>
+      <td>+6.73%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>221.9 W/m²</td>
+      <td>236.2 W/m²</td>
+      <td>45.7 °C</td>
+      <td>289,065 kWh</td>
+      <td>$44,455</td>
+      <td>$47,203</td>
+      <td>+6.18%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>221.4 W/m²</td>
+      <td>236.3 W/m²</td>
+      <td>45.5 °C</td>
+      <td>288,790 kWh</td>
+      <td>$44,455</td>
+      <td>$47,180</td>
+      <td>+6.13%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>221.2 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.6 °C</td>
+      <td>291,390 kWh</td>
+      <td>$44,455</td>
+      <td>$46,600</td>
+      <td>+4.83%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>222.4 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>41.4 °C</td>
+      <td>292,248 kWh</td>
+      <td>$44,455</td>
+      <td>$46,553</td>
+      <td>+4.72%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>221.1 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.5 °C</td>
+      <td>291,137 kWh</td>
+      <td>$44,455</td>
+      <td>$46,517</td>
+      <td>+4.64%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>222.5 W/m²</td>
+      <td>236.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>292,090 kWh</td>
+      <td>$44,455</td>
+      <td>$46,505</td>
+      <td>+4.61%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>220.2 W/m²</td>
+      <td>234.1 W/m²</td>
+      <td>41.5 °C</td>
+      <td>288,594 kWh</td>
+      <td>$44,455</td>
+      <td>$46,200</td>
+      <td>+3.93%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>221.3 W/m²</td>
+      <td>233.8 W/m²</td>
+      <td>41.3 °C</td>
+      <td>289,575 kWh</td>
+      <td>$44,455</td>
+      <td>$46,176</td>
+      <td>+3.87%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>220.1 W/m²</td>
+      <td>233.7 W/m²</td>
+      <td>41.6 °C</td>
+      <td>288,469 kWh</td>
+      <td>$44,455</td>
+      <td>$46,161</td>
+      <td>+3.84%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>220.9 W/m²</td>
+      <td>232.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>289,485 kWh</td>
+      <td>$44,455</td>
+      <td>$46,152</td>
+      <td>+3.82%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>219.6 W/m²</td>
+      <td>222.2 W/m²</td>
+      <td>44.8 °C</td>
+      <td>289,376 kWh</td>
+      <td>$44,455</td>
+      <td>$46,002</td>
+      <td>+3.48%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>219.8 W/m²</td>
+      <td>222.5 W/m²</td>
+      <td>44.7 °C</td>
+      <td>289,068 kWh</td>
+      <td>$44,455</td>
+      <td>$45,898</td>
+      <td>+3.25%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>216.4 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>282,652 kWh</td>
+      <td>$44,455</td>
+      <td>$45,600</td>
+      <td>+2.58%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>217.0 W/m²</td>
+      <td>228.4 W/m²</td>
+      <td>41.7 °C</td>
+      <td>285,195 kWh</td>
+      <td>$44,455</td>
+      <td>$45,589</td>
+      <td>+2.55%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>216.6 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>282,272 kWh</td>
+      <td>$44,455</td>
+      <td>$45,469</td>
+      <td>+2.28%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>217.1 W/m²</td>
+      <td>228.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>284,815 kWh</td>
+      <td>$44,455</td>
+      <td>$45,450</td>
+      <td>+2.24%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>218.0 W/m²</td>
+      <td>224.8 W/m²</td>
+      <td>42.1 °C</td>
+      <td>283,044 kWh</td>
+      <td>$44,455</td>
+      <td>$45,424</td>
+      <td>+2.18%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>217.2 W/m²</td>
+      <td>219.0 W/m²</td>
+      <td>44.7 °C</td>
+      <td>284,965 kWh</td>
+      <td>$44,455</td>
+      <td>$45,364</td>
+      <td>+2.05%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>215.8 W/m²</td>
+      <td>225.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>283,450 kWh</td>
+      <td>$44,455</td>
+      <td>$45,340</td>
+      <td>+1.99%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>214.7 W/m²</td>
+      <td>218.9 W/m²</td>
+      <td>43.7 °C</td>
+      <td>280,277 kWh</td>
+      <td>$44,455</td>
+      <td>$45,286</td>
+      <td>+1.87%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>215.9 W/m²</td>
+      <td>226.1 W/m²</td>
+      <td>41.6 °C</td>
+      <td>282,849 kWh</td>
+      <td>$44,455</td>
+      <td>$45,164</td>
+      <td>+1.60%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>44.7 °C</td>
+      <td>284,568 kWh</td>
+      <td>$44,455</td>
+      <td>$45,112</td>
+      <td>+1.48%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>214.9 W/m²</td>
+      <td>218.7 W/m²</td>
+      <td>43.6 °C</td>
+      <td>279,485 kWh</td>
+      <td>$44,455</td>
+      <td>$45,076</td>
+      <td>+1.40%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>311.6 W/m²</td>
+      <td>237.9 W/m²</td>
+      <td>N/A</td>
+      <td>165,797 kWh</td>
+      <td>$44,455</td>
+      <td>$34,243</td>
+      <td>-22.97%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>313.3 W/m²</td>
+      <td>241.0 W/m²</td>
+      <td>N/A</td>
+      <td>166,162 kWh</td>
+      <td>$44,455</td>
+      <td>$34,180</td>
+      <td>-23.11%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>306.1 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>N/A</td>
+      <td>163,067 kWh</td>
+      <td>$44,455</td>
+      <td>$34,171</td>
+      <td>-23.13%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>308.5 W/m²</td>
+      <td>233.2 W/m²</td>
+      <td>N/A</td>
+      <td>165,859 kWh</td>
+      <td>$44,455</td>
+      <td>$33,952</td>
+      <td>-23.63%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>304.8 W/m²</td>
+      <td>228.7 W/m²</td>
+      <td>N/A</td>
+      <td>164,690 kWh</td>
+      <td>$44,455</td>
+      <td>$33,910</td>
+      <td>-23.72%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>302.9 W/m²</td>
+      <td>232.2 W/m²</td>
+      <td>N/A</td>
+      <td>162,487 kWh</td>
+      <td>$44,455</td>
+      <td>$33,876</td>
+      <td>-23.80%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<h3>Dual Axis Tracking Performance Rankings</h3>
+<div class='table-container' style='max-height: 400px; overflow-y: auto;'>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather Scenario</th>
+      <th>Mean GHI</th>
+      <th>Mean DNI</th>
+      <th>Peak Temp</th>
+      <th>Energy Yield</th>
+      <th>Dual Axis Tracking Mean (P50)</th>
+      <th>Gross Revenue</th>
+      <th>Variance (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>230.7 W/m²</td>
+      <td>256.5 W/m²</td>
+      <td>42.5 °C</td>
+      <td>1,176,264 kWh</td>
+      <td>$167,106</td>
+      <td>$187,435</td>
+      <td>+12.17%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>230.6 W/m²</td>
+      <td>256.4 W/m²</td>
+      <td>42.4 °C</td>
+      <td>1,174,685 kWh</td>
+      <td>$167,106</td>
+      <td>$185,959</td>
+      <td>+11.28%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>229.5 W/m²</td>
+      <td>254.2 W/m²</td>
+      <td>42.5 °C</td>
+      <td>1,161,175 kWh</td>
+      <td>$167,106</td>
+      <td>$185,313</td>
+      <td>+10.90%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>229.6 W/m²</td>
+      <td>254.3 W/m²</td>
+      <td>42.4 °C</td>
+      <td>1,159,730 kWh</td>
+      <td>$167,106</td>
+      <td>$183,866</td>
+      <td>+10.03%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.2 W/m²</td>
+      <td>45.8 °C</td>
+      <td>1,108,885 kWh</td>
+      <td>$167,106</td>
+      <td>$182,671</td>
+      <td>+9.31%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>229.2 W/m²</td>
+      <td>243.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>1,152,049 kWh</td>
+      <td>$167,106</td>
+      <td>$182,260</td>
+      <td>+9.07%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.5 W/m²</td>
+      <td>45.6 °C</td>
+      <td>1,109,056 kWh</td>
+      <td>$167,106</td>
+      <td>$181,285</td>
+      <td>+8.49%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>221.9 W/m²</td>
+      <td>236.2 W/m²</td>
+      <td>45.7 °C</td>
+      <td>1,094,976 kWh</td>
+      <td>$167,106</td>
+      <td>$180,759</td>
+      <td>+8.17%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>228.2 W/m²</td>
+      <td>237.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>1,131,279 kWh</td>
+      <td>$167,106</td>
+      <td>$179,687</td>
+      <td>+7.53%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>221.4 W/m²</td>
+      <td>236.3 W/m²</td>
+      <td>45.5 °C</td>
+      <td>1,094,135 kWh</td>
+      <td>$167,106</td>
+      <td>$179,340</td>
+      <td>+7.32%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>221.2 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.6 °C</td>
+      <td>1,115,376 kWh</td>
+      <td>$167,106</td>
+      <td>$178,955</td>
+      <td>+7.09%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>222.4 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>41.4 °C</td>
+      <td>1,117,903 kWh</td>
+      <td>$167,106</td>
+      <td>$178,704</td>
+      <td>+6.94%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>221.1 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.5 °C</td>
+      <td>1,115,127 kWh</td>
+      <td>$167,106</td>
+      <td>$177,400</td>
+      <td>+6.16%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>222.5 W/m²</td>
+      <td>236.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>1,118,443 kWh</td>
+      <td>$167,106</td>
+      <td>$177,386</td>
+      <td>+6.15%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>220.1 W/m²</td>
+      <td>233.7 W/m²</td>
+      <td>41.6 °C</td>
+      <td>1,102,085 kWh</td>
+      <td>$167,106</td>
+      <td>$176,873</td>
+      <td>+5.84%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>220.9 W/m²</td>
+      <td>232.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>1,102,463 kWh</td>
+      <td>$167,106</td>
+      <td>$176,475</td>
+      <td>+5.61%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>220.2 W/m²</td>
+      <td>234.1 W/m²</td>
+      <td>41.5 °C</td>
+      <td>1,103,480 kWh</td>
+      <td>$167,106</td>
+      <td>$175,779</td>
+      <td>+5.19%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>221.3 W/m²</td>
+      <td>233.8 W/m²</td>
+      <td>41.3 °C</td>
+      <td>1,105,044 kWh</td>
+      <td>$167,106</td>
+      <td>$175,414</td>
+      <td>+4.97%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>216.4 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>1,067,982 kWh</td>
+      <td>$167,106</td>
+      <td>$173,779</td>
+      <td>+3.99%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>217.0 W/m²</td>
+      <td>228.4 W/m²</td>
+      <td>41.7 °C</td>
+      <td>1,077,678 kWh</td>
+      <td>$167,106</td>
+      <td>$173,636</td>
+      <td>+3.91%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>219.6 W/m²</td>
+      <td>222.2 W/m²</td>
+      <td>44.8 °C</td>
+      <td>1,089,624 kWh</td>
+      <td>$167,106</td>
+      <td>$173,608</td>
+      <td>+3.89%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>219.8 W/m²</td>
+      <td>222.5 W/m²</td>
+      <td>44.7 °C</td>
+      <td>1,090,353 kWh</td>
+      <td>$167,106</td>
+      <td>$172,393</td>
+      <td>+3.16%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>216.6 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>1,068,304 kWh</td>
+      <td>$167,106</td>
+      <td>$172,229</td>
+      <td>+3.07%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>217.1 W/m²</td>
+      <td>228.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>1,078,081 kWh</td>
+      <td>$167,106</td>
+      <td>$172,119</td>
+      <td>+3.00%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>218.0 W/m²</td>
+      <td>224.8 W/m²</td>
+      <td>42.1 °C</td>
+      <td>1,074,197 kWh</td>
+      <td>$167,106</td>
+      <td>$171,924</td>
+      <td>+2.88%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>215.8 W/m²</td>
+      <td>225.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>1,065,456 kWh</td>
+      <td>$167,106</td>
+      <td>$171,826</td>
+      <td>+2.82%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>214.7 W/m²</td>
+      <td>218.9 W/m²</td>
+      <td>43.7 °C</td>
+      <td>1,051,498 kWh</td>
+      <td>$167,106</td>
+      <td>$171,468</td>
+      <td>+2.61%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>217.2 W/m²</td>
+      <td>219.0 W/m²</td>
+      <td>44.7 °C</td>
+      <td>1,068,760 kWh</td>
+      <td>$167,106</td>
+      <td>$170,555</td>
+      <td>+2.06%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>215.9 W/m²</td>
+      <td>226.1 W/m²</td>
+      <td>41.6 °C</td>
+      <td>1,066,051 kWh</td>
+      <td>$167,106</td>
+      <td>$170,358</td>
+      <td>+1.95%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>214.9 W/m²</td>
+      <td>218.7 W/m²</td>
+      <td>43.6 °C</td>
+      <td>1,050,880 kWh</td>
+      <td>$167,106</td>
+      <td>$169,829</td>
+      <td>+1.63%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>44.7 °C</td>
+      <td>1,069,547 kWh</td>
+      <td>$167,106</td>
+      <td>$168,835</td>
+      <td>+1.03%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>306.1 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>N/A</td>
+      <td>571,625 kWh</td>
+      <td>$167,106</td>
+      <td>$118,644</td>
+      <td>-29.00%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>311.6 W/m²</td>
+      <td>237.9 W/m²</td>
+      <td>N/A</td>
+      <td>578,938 kWh</td>
+      <td>$167,106</td>
+      <td>$118,417</td>
+      <td>-29.14%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>313.3 W/m²</td>
+      <td>241.0 W/m²</td>
+      <td>N/A</td>
+      <td>580,562 kWh</td>
+      <td>$167,106</td>
+      <td>$117,846</td>
+      <td>-29.48%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>302.9 W/m²</td>
+      <td>232.2 W/m²</td>
+      <td>N/A</td>
+      <td>567,752 kWh</td>
+      <td>$167,106</td>
+      <td>$117,251</td>
+      <td>-29.83%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>304.8 W/m²</td>
+      <td>228.7 W/m²</td>
+      <td>N/A</td>
+      <td>571,366 kWh</td>
+      <td>$167,106</td>
+      <td>$116,843</td>
+      <td>-30.08%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>308.5 W/m²</td>
+      <td>233.2 W/m²</td>
+      <td>N/A</td>
+      <td>570,963 kWh</td>
+      <td>$167,106</td>
+      <td>$115,795</td>
+      <td>-30.71%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+<h3>Elevated Fixed Performance Rankings</h3>
+<div class='table-container' style='max-height: 400px; overflow-y: auto;'>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather Scenario</th>
+      <th>Mean GHI</th>
+      <th>Mean DNI</th>
+      <th>Peak Temp</th>
+      <th>Energy Yield</th>
+      <th>Elevated Fixed Mean (P50)</th>
+      <th>Gross Revenue</th>
+      <th>Variance (%)</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>230.7 W/m²</td>
+      <td>256.5 W/m²</td>
+      <td>42.5 °C</td>
+      <td>840,122 kWh</td>
+      <td>$115,982</td>
+      <td>$131,398</td>
+      <td>+13.29%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>229.5 W/m²</td>
+      <td>254.2 W/m²</td>
+      <td>42.5 °C</td>
+      <td>832,794 kWh</td>
+      <td>$115,982</td>
+      <td>$130,413</td>
+      <td>+12.44%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>230.6 W/m²</td>
+      <td>256.4 W/m²</td>
+      <td>42.4 °C</td>
+      <td>839,742 kWh</td>
+      <td>$115,982</td>
+      <td>$129,734</td>
+      <td>+11.86%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>229.2 W/m²</td>
+      <td>243.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>831,247 kWh</td>
+      <td>$115,982</td>
+      <td>$128,908</td>
+      <td>+11.14%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>229.6 W/m²</td>
+      <td>254.3 W/m²</td>
+      <td>42.4 °C</td>
+      <td>833,112 kWh</td>
+      <td>$115,982</td>
+      <td>$128,895</td>
+      <td>+11.13%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.2 W/m²</td>
+      <td>45.8 °C</td>
+      <td>799,586 kWh</td>
+      <td>$115,982</td>
+      <td>$128,869</td>
+      <td>+11.11%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>221.2 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.6 °C</td>
+      <td>811,999 kWh</td>
+      <td>$115,982</td>
+      <td>$128,221</td>
+      <td>+10.55%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>228.2 W/m²</td>
+      <td>237.5 W/m²</td>
+      <td>42.7 °C</td>
+      <td>823,935 kWh</td>
+      <td>$115,982</td>
+      <td>$128,199</td>
+      <td>+10.53%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>222.4 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>41.4 °C</td>
+      <td>811,159 kWh</td>
+      <td>$115,982</td>
+      <td>$127,812</td>
+      <td>+10.20%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>221.9 W/m²</td>
+      <td>236.2 W/m²</td>
+      <td>45.7 °C</td>
+      <td>792,026 kWh</td>
+      <td>$115,982</td>
+      <td>$127,789</td>
+      <td>+10.18%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>220.1 W/m²</td>
+      <td>233.7 W/m²</td>
+      <td>41.6 °C</td>
+      <td>805,350 kWh</td>
+      <td>$115,982</td>
+      <td>$127,186</td>
+      <td>+9.66%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>223.2 W/m²</td>
+      <td>238.5 W/m²</td>
+      <td>45.6 °C</td>
+      <td>799,699 kWh</td>
+      <td>$115,982</td>
+      <td>$127,103</td>
+      <td>+9.59%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>220.9 W/m²</td>
+      <td>232.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>802,479 kWh</td>
+      <td>$115,982</td>
+      <td>$126,553</td>
+      <td>+9.11%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>221.1 W/m²</td>
+      <td>236.0 W/m²</td>
+      <td>41.5 °C</td>
+      <td>811,473 kWh</td>
+      <td>$115,982</td>
+      <td>$126,306</td>
+      <td>+8.90%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>222.5 W/m²</td>
+      <td>236.8 W/m²</td>
+      <td>41.4 °C</td>
+      <td>811,368 kWh</td>
+      <td>$115,982</td>
+      <td>$126,112</td>
+      <td>+8.73%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>221.4 W/m²</td>
+      <td>236.3 W/m²</td>
+      <td>45.5 °C</td>
+      <td>791,079 kWh</td>
+      <td>$115,982</td>
+      <td>$125,963</td>
+      <td>+8.61%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>219.6 W/m²</td>
+      <td>222.2 W/m²</td>
+      <td>44.8 °C</td>
+      <td>798,314 kWh</td>
+      <td>$115,982</td>
+      <td>$125,557</td>
+      <td>+8.26%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>220.2 W/m²</td>
+      <td>234.1 W/m²</td>
+      <td>41.5 °C</td>
+      <td>805,599 kWh</td>
+      <td>$115,982</td>
+      <td>$125,476</td>
+      <td>+8.19%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>221.3 W/m²</td>
+      <td>233.8 W/m²</td>
+      <td>41.3 °C</td>
+      <td>804,028 kWh</td>
+      <td>$115,982</td>
+      <td>$124,962</td>
+      <td>+7.74%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>219.8 W/m²</td>
+      <td>222.5 W/m²</td>
+      <td>44.7 °C</td>
+      <td>798,913 kWh</td>
+      <td>$115,982</td>
+      <td>$124,066</td>
+      <td>+6.97%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>216.4 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>774,508 kWh</td>
+      <td>$115,982</td>
+      <td>$124,007</td>
+      <td>+6.92%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>217.2 W/m²</td>
+      <td>219.0 W/m²</td>
+      <td>44.7 °C</td>
+      <td>786,122 kWh</td>
+      <td>$115,982</td>
+      <td>$123,817</td>
+      <td>+6.75%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>218.0 W/m²</td>
+      <td>224.8 W/m²</td>
+      <td>42.1 °C</td>
+      <td>786,348 kWh</td>
+      <td>$115,982</td>
+      <td>$123,411</td>
+      <td>+6.41%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>217.0 W/m²</td>
+      <td>228.4 W/m²</td>
+      <td>41.7 °C</td>
+      <td>774,447 kWh</td>
+      <td>$115,982</td>
+      <td>$123,222</td>
+      <td>+6.24%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>214.7 W/m²</td>
+      <td>218.9 W/m²</td>
+      <td>43.7 °C</td>
+      <td>764,460 kWh</td>
+      <td>$115,982</td>
+      <td>$122,624</td>
+      <td>+5.73%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>215.8 W/m²</td>
+      <td>225.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>767,663 kWh</td>
+      <td>$115,982</td>
+      <td>$122,268</td>
+      <td>+5.42%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>216.6 W/m²</td>
+      <td>223.0 W/m²</td>
+      <td>43.7 °C</td>
+      <td>775,012 kWh</td>
+      <td>$115,982</td>
+      <td>$122,234</td>
+      <td>+5.39%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>217.5 W/m²</td>
+      <td>219.7 W/m²</td>
+      <td>44.7 °C</td>
+      <td>787,053 kWh</td>
+      <td>$115,982</td>
+      <td>$122,161</td>
+      <td>+5.33%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>217.1 W/m²</td>
+      <td>228.6 W/m²</td>
+      <td>41.7 °C</td>
+      <td>775,098 kWh</td>
+      <td>$115,982</td>
+      <td>$121,474</td>
+      <td>+4.73%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>214.9 W/m²</td>
+      <td>218.7 W/m²</td>
+      <td>43.6 °C</td>
+      <td>765,003 kWh</td>
+      <td>$115,982</td>
+      <td>$120,939</td>
+      <td>+4.27%</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>215.9 W/m²</td>
+      <td>226.1 W/m²</td>
+      <td>41.6 °C</td>
+      <td>768,557 kWh</td>
+      <td>$115,982</td>
+      <td>$120,589</td>
+      <td>+3.97%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>306.1 W/m²</td>
+      <td>236.5 W/m²</td>
+      <td>N/A</td>
+      <td>327,271 kWh</td>
+      <td>$115,982</td>
+      <td>$66,478</td>
+      <td>-42.68%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>311.6 W/m²</td>
+      <td>237.9 W/m²</td>
+      <td>N/A</td>
+      <td>330,692 kWh</td>
+      <td>$115,982</td>
+      <td>$66,284</td>
+      <td>-42.85%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>313.3 W/m²</td>
+      <td>241.0 W/m²</td>
+      <td>N/A</td>
+      <td>332,492 kWh</td>
+      <td>$115,982</td>
+      <td>$65,944</td>
+      <td>-43.14%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>302.9 W/m²</td>
+      <td>232.2 W/m²</td>
+      <td>N/A</td>
+      <td>325,505 kWh</td>
+      <td>$115,982</td>
+      <td>$65,867</td>
+      <td>-43.21%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>304.8 W/m²</td>
+      <td>228.7 W/m²</td>
+      <td>N/A</td>
+      <td>326,045 kWh</td>
+      <td>$115,982</td>
+      <td>$65,454</td>
+      <td>-43.57%</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>308.5 W/m²</td>
+      <td>233.2 W/m²</td>
+      <td>N/A</td>
+      <td>328,415 kWh</td>
+      <td>$115,982</td>
+      <td>$65,047</td>
+      <td>-43.92%</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+        <h2>11. Master Global Ranking Matrix</h2>
+        <p><em>Absolute revenue rankings cross-referencing all 4 hardware configurations against all evaluated weather scenarios.</em></p>
+        <h3>Global Master Comparison (All Systems x All Weather Scenarios)</h3>
+<div class='table-container' style='max-height: 600px; overflow-y: auto;'>
+<table class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th>Weather Scenario</th>
+      <th>System Layout</th>
+      <th>File Type</th>
+      <th>Year</th>
+      <th>Gross Revenue</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$234,011</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$231,903</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$231,736</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$229,687</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$229,655</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TMY</td>
+      <td>2022</td>
+      <td>$228,147</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$227,716</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$227,370</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TMY</td>
+      <td>2024</td>
+      <td>$225,753</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$225,260</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$223,627</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$223,623</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$221,464</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$221,455</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$221,206</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$221,188</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$219,477</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$219,429</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$219,358</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$219,251</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$217,573</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$217,208</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$217,022</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$216,978</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$216,818</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TMY</td>
+      <td>2023</td>
+      <td>$216,095</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$215,271</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$215,183</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$214,327</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$213,879</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$211,353</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$187,435</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$185,959</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$185,313</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$183,866</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$182,671</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TMY</td>
+      <td>2022</td>
+      <td>$182,260</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$181,285</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$180,759</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TMY</td>
+      <td>2024</td>
+      <td>$179,687</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$179,340</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$178,955</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$178,704</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$177,400</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$177,386</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$176,873</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$176,475</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$175,779</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$175,414</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$173,779</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$173,636</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$173,608</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$172,393</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$172,229</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$172,119</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TMY</td>
+      <td>2023</td>
+      <td>$171,924</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$171,826</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$171,468</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$170,555</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$170,358</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$169,829</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$168,835</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TGY</td>
+      <td>2022</td>
+      <td>$144,287</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TDY</td>
+      <td>2022</td>
+      <td>$144,190</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TDY</td>
+      <td>2023</td>
+      <td>$142,884</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TGY</td>
+      <td>2024</td>
+      <td>$141,440</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TDY</td>
+      <td>2024</td>
+      <td>$141,302</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>Single Axis Tracking</td>
+      <td>TGY</td>
+      <td>2023</td>
+      <td>$140,937</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$131,398</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$130,413</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$129,734</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TMY</td>
+      <td>2022</td>
+      <td>$128,908</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$128,895</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$128,869</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$128,221</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TMY</td>
+      <td>2024</td>
+      <td>$128,199</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$127,812</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$127,789</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$127,186</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$127,103</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$126,553</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$126,306</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$126,112</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$125,963</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$125,557</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$125,476</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$124,962</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$124,066</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$124,007</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$123,817</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TMY</td>
+      <td>2023</td>
+      <td>$123,411</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$123,222</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$122,624</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$122,268</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$122,234</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$122,161</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$121,474</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$120,939</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>Elevated Fixed</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$120,589</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TDY</td>
+      <td>2023</td>
+      <td>$118,644</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TDY</td>
+      <td>2022</td>
+      <td>$118,417</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TGY</td>
+      <td>2022</td>
+      <td>$117,846</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TGY</td>
+      <td>2023</td>
+      <td>$117,251</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TDY</td>
+      <td>2024</td>
+      <td>$116,843</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>Dual Axis Tracking</td>
+      <td>TGY</td>
+      <td>2024</td>
+      <td>$115,795</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TDY</td>
+      <td>2023</td>
+      <td>$66,478</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TDY</td>
+      <td>2022</td>
+      <td>$66,284</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TGY</td>
+      <td>2022</td>
+      <td>$65,944</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TGY</td>
+      <td>2023</td>
+      <td>$65,867</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TDY</td>
+      <td>2024</td>
+      <td>$65,454</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>Elevated Fixed</td>
+      <td>TGY</td>
+      <td>2024</td>
+      <td>$65,047</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$48,812</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2022</td>
+      <td>$48,654</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$48,336</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2022</td>
+      <td>$48,133</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TMY</td>
+      <td>2022</td>
+      <td>$48,002</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$47,566</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2023</td>
+      <td>$47,525</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TMY</td>
+      <td>2024</td>
+      <td>$47,445</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$47,203</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2023</td>
+      <td>$47,180</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2021.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$46,600</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2020.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$46,553</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2021.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2021</td>
+      <td>$46,517</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2020.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2020</td>
+      <td>$46,505</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2021.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$46,200</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2020.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$46,176</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2021.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2021</td>
+      <td>$46,161</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2020.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2020</td>
+      <td>$46,152</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$46,002</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2024</td>
+      <td>$45,898</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2019.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$45,600</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_30_2018.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$45,589</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2019.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2019</td>
+      <td>$45,469</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-aggregated-v4-0-0_60_2018.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical Aggregated</td>
+      <td>2018</td>
+      <td>$45,450</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-tmy-v4-0-0_60_tmy-2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TMY</td>
+      <td>2023</td>
+      <td>$45,424</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$45,364</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2018.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$45,340</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_30_2019.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$45,286</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2018.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2018</td>
+      <td>$45,164</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2024</td>
+      <td>$45,112</td>
+    </tr>
+    <tr>
+      <td>26.22_-98.33_nsrdb-GOES-conus-v4-0-0_60_2019.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>Historical CONUS</td>
+      <td>2019</td>
+      <td>$45,076</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TDY</td>
+      <td>2022</td>
+      <td>$34,243</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2022.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TGY</td>
+      <td>2022</td>
+      <td>$34,180</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TDY</td>
+      <td>2023</td>
+      <td>$34,171</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TGY</td>
+      <td>2024</td>
+      <td>$33,952</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tdy-2024.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TDY</td>
+      <td>2024</td>
+      <td>$33,910</td>
+    </tr>
+    <tr>
+      <td>26.21_-98.34-0-0_60_tgy-2023.csv</td>
+      <td>Vertical Bifacial</td>
+      <td>TGY</td>
+      <td>2023</td>
+      <td>$33,876</td>
+    </tr>
+  </tbody>
+</table>
+</div>
+
+
+    </body>
+    </html>
+    

@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Meteorological Irradiance Analysis</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans p-4 md:p-8">
+
+    <div class="max-w-6xl mx-auto">
+        <header class="mb-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4 border-b border-gray-200 pb-6">
+            <div>
+                <h1 class="text-3xl font-extrabold text-gray-900 tracking-tight">Meteorological Irradiance Analysis</h1>
+                <p class="text-gray-600 mt-1">Validation of NSRDB Satellite Radiative Transfer Models against DOE ARM Ground Observations.</p>
+            </div>
+            <div class="flex flex-wrap gap-3">
+                <a href="./index.html" class="bg-white hover:bg-gray-50 text-gray-700 font-semibold py-2 px-4 border border-gray-300 rounded shadow-sm transition-colors text-sm">
+                    ← Back to Main Dashboard
+                </a>
+                <a href="./agrivoltaic_master_defense_report.html" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded shadow transition-colors text-sm">
+                    View Master Defense Report
+                </a>
+            </div>
+        </header>
+
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8 border border-gray-200">
+            <div class="mb-6">
+                <span class="bg-orange-100 text-orange-800 text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Coastal Atmospheric Profile</span>
+                <h2 class="text-2xl font-bold text-gray-900 mt-2">Houston TRACER Campaign (Texas Gulf Coast)</h2>
+                <p class="text-gray-600 mt-1 text-sm">Chronological cross-year data isolating micro-seasonal bias under high humidity and urban aerosol conditions.</p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 flex justify-center items-center overflow-hidden">
+                <img src="./plots/Houston_TRACER_(2021-2022)_Monthly_Irradiance_Comparison.png" 
+                     alt="Houston Monthly Irradiance Comparison" 
+                     class="max-w-full h-auto rounded shadow-sm hover:scale-[1.01] transition-transform duration-300">
+            </div>
+
+            <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <h3 class="text-sm font-bold text-blue-900 uppercase tracking-wide">Key Meteorological Takeaway</h3>
+                <p class="text-gray-700 text-sm mt-1 leading-relaxed">
+                    The direct comparison of <strong>DNI (Direct Normal Irradiance)</strong> highlights a persistent systemic underestimation by the satellite model during coastal haze and summer humid periods. Because dual-axis tracking systems rely aggressively on the direct beam, this macro-seasonal gap directly propagates into the structural generation errors identified in the validation matrix.
+                </p>
+            </div>
+        </div>
+
+        <div class="bg-white rounded-xl shadow-md p-6 border border-gray-200">
+            <div class="mb-6">
+                <span class="bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded-full uppercase tracking-wider">Continental Plains Profile</span>
+                <h2 class="text-2xl font-bold text-gray-900 mt-2">Southern Great Plains (Lamont, OK)</h2>
+                <p class="text-gray-600 mt-1 text-sm">Strict 12-month calendar baseline isolating continental flat-plains weather patterns with high direct sunlight components.</p>
+            </div>
+            
+            <div class="bg-gray-50 rounded-lg p-4 border border-gray-200 flex justify-center items-center overflow-hidden">
+                <img src="./plots/SGP_Lamont_(2019)_Monthly_Irradiance_Comparison.png" 
+                     alt="SGP Monthly Irradiance Comparison" 
+                     class="max-w-full h-auto rounded shadow-sm hover:scale-[1.01] transition-transform duration-300">
+            </div>
+
+            <div class="mt-6 bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                <h3 class="text-sm font-bold text-blue-900 uppercase tracking-wide">Key Meteorological Takeaway</h3>
+                <p class="text-gray-700 text-sm mt-1 leading-relaxed">
+                    In flat continental terrains, the satellite's physical solar model tracks closer to ground observations for <strong>GHI</strong>. However, localized cloud-edge enhancements and shifting aerosol dynamics captured by the ground-based pyranometers still cause noticeable divergence in the peak summer <strong>DNI</strong> profiles, illustrating the limitations of 4km satellite grid averaging.
+                </p>
+            </div>
+        </div>
+
+        <footer class="mt-12 text-center text-xs text-gray-500 pb-8">
+            <p>Data Sources: Department of Energy (DOE) Atmospheric Radiation Measurement (ARM) facility | NREL National Solar Radiation Database (NSRDB)</p>
+        </footer>
+    </div>
+
+</body>
+</html>

@@ -1,10 +1,7 @@
-Variable,Model,RMSE,MAE,MBE,Observed Mean
-GHI (W/m²),ARM (Ground Truth),-,-,-,186.31
-GHI (W/m²),NSRDB (Satellite),379.7,263.43,3.08,-
-GHI (W/m²),HRRR (Physics),331.31,186.31,-186.31,-
-Tdry (°C),ARM (Ground Truth),-,-,-,14.78
-Tdry (°C),NSRDB (Satellite),5.26,4.12,-0.18,-
-Tdry (°C),HRRR (Physics),15.13,12.11,10.22,-
-Wspd (m/s),ARM (Ground Truth),-,-,-,1.0
-Wspd (m/s),NSRDB (Satellite),2.78,2.22,2.19,-
-Wspd (m/s),HRRR (Physics),0.0,0.0,0.0,-
+Variable,Model,RMSE,MAE,MBE,Mean Value
+GHI (W/m²),ARM (Ground Truth),0.0,0.0,0.0,186.31
+GHI (W/m²),NSRDB (Satellite),379.7,263.43,3.08,189.39
+Tdry (°C),ARM (Ground Truth),0.0,0.0,0.0,14.78
+Tdry (°C),NSRDB (Satellite),5.26,4.12,-0.18,14.6
+Wspd (m/s),ARM (Ground Truth),0.0,0.0,0.0,1.0
+Wspd (m/s),NSRDB (Satellite),2.78,2.22,2.19,3.19
